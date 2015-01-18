@@ -1,5 +1,7 @@
 library(knitr)
-ipython_wrapper <- "ipython_wrapper.py"
+
+ipython_wrapper <- system.file('python', 'ipython_wrapper.py', package='knitron')
+if (ipython_wrapper == "") ipython_wrapper <- "inst/ipython_wrapper.py"
 
 IPython.start <- function() {
   ipython_tmp <- tempfile()
