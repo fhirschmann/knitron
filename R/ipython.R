@@ -22,7 +22,7 @@ IPython.execute <- function(kernel, code) {
   require(jsonlite)
   
   json_file = tempfile()
-  args = paste('--colors', 'NoColor', ipython_wrapper, kernel,
+  args = paste("--colors", "NoColor", ipython_wrapper, kernel,
                'eval', json_file)
   system2("ipython", args, input = code)
   fromJSON(readLines(json_file))
@@ -45,7 +45,7 @@ eng_ipython = function(options) {
   output <- IPython.execute(global_kernel, options$code)
   
   # Collapse the stdout stream
-  streams = paste(output[output$msg_type == "stream", ]$content$data, collapse="")
+  streams <- paste(output[output$msg_type == "stream", ]$content$data, collapse="")
   
   knitr::engine_output(options, options$code, streams, extra = NULL)
 }
