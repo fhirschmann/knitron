@@ -1,0 +1,39 @@
+# Test
+
+
+```{r, engine='ipython', engine.debug=T}
+x = 1
+print(x)
+```
+
+```{r, engine='ipython'}
+print(x)
+print(4)
+print(6)
+```
+
+```{r, engine='ipython'}
+import numpy as np
+print(np.zeros((4,4)))
+```
+
+```{r, engine='ipython'}
+print("foo")
+```
+
+```{r, engine='ipython'}
+#raise ValueError("foo")
+print(4)
+```
+
+```{r, engine='ipython'}
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np
+x = np.linspace(0, 3*np.pi, 500)
+plt.plot(x, np.sin(x**2))
+plt.title('A simple chirp');
+print(1)
+plt.plot(x, np.sin(x**3))
+plt.title('A simple chirp2');
+```
