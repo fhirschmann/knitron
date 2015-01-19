@@ -54,6 +54,9 @@ eng_ipython = function(options, kernel) {
   extra <- if (!is.null(figure)) {
     knit_hooks$get("plot")(figure, options)
   } else NULL
+
+  # We set the engine to python for further processing (highlighting)
+  options$engine <- "python"
   knitr::engine_output(options, options$code, out, extra)
 }
 
