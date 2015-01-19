@@ -23,7 +23,7 @@ IPython.execute <- function(kernel, code) {
   
   json_file = tempfile()
   args = paste("--colors", "NoColor", ipython_wrapper, kernel, json_file)
-  system2("ipython", args, input = toJSON(code))
+  system2("ipython", args, input = toJSON(code, auto_unbox = TRUE))
   fromJSON(readLines(json_file))
 }
 
