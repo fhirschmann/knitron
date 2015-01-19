@@ -7,9 +7,12 @@ Author: Fabian Hirschmann
 Maintainer: Fabian Hirschmann <fabian@hirschmann.email>
 Description: This packages integrates IPython and matplotlib into Knitr.
 License: MIT
-Depends:
-    R (>= 2.14.1)
-    knitr (>= 1.8.16)
-    jsonlite (=> 0.9.13)
 URL: http://github.com/fhirschmann/knitron
 BugReports: https://github.com/fhirschmann/knitron/issues
+Depends:
+    R (>= 2.14.1)
+Imports:
+    knitr (>= 1.8),
+    jsonlite(>= 0.9.13)
+Suggests:
+    testthat(>= 0.9)
