@@ -63,14 +63,12 @@ eng_ipython = function(options, kernel) {
   }
   
   output <- output[output$msg_type %in% c("stream", "pyout"), ]
-  if (options$knitron.print == TRUE) {
+  if (is.logical(options$knitron.print)) {
     # User overwrites automatic selection
-    output$print <- TRUE
-  } else {
-    # Always print stdout stream
-    output[output$msg_type == "stream", "print"] <- TRUE
+    output[, "print"] <- options$knitron.print
   }
   
+  # Prepare out and extra for knitr
   out <- if (sum(output$print) > 0) {
     output[output$print, ]$content$data
   } else NULL
