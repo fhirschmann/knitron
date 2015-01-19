@@ -22,23 +22,6 @@ class KnitrEncoder(JSONEncoder):
         return "__unserializable_python_object__"
 
 
-def execute(code, client):
-    client.execute(code)
-    output = []
-
-    while True:
-        try:
-            msg = client.get_iopub_msg()
-            output.append(msg)
-
-            if msg["content"].get("execution_state", None) == "idle":
-                break
-        except Empty:
-            sleep(0.5)
-
-    return output
-
-
 class IPythonClient(object):
     DEV_MAP = {
         "png": "AGG",
