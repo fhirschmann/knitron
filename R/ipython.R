@@ -18,24 +18,29 @@ IPython.start <- function() {
   kernel
 }
 
-IPython.execute <- function(kernel, code) {
+IPython.execute_chunk <- function(kernel, code) {
   require(jsonlite)
   
   json_file = tempfile()
-  args = paste("--colors", "NoColor", ipython_wrapper, kernel, json_file)
+  args = paste("--colors", "NoColor", ipython_wrapper, kernel, "chunk", json_file)
   system2("ipython", args, input = toJSON(code, auto_unbox = TRUE))
   fromJSON(readLines(json_file))
 }
 
+IPython.execute_code <- function(kernel, code) {
+  args = paste(ipython_wrapper, kernel, "code", code)
+  system2("ipython", args)
+}
+
 IPython.terminate <- function(kernel) {
-  IPython.execute(kernel, list(code="quit"))
+  IPython.execute_code(kernel, "quit")
   message("Terminated IPython kernel with ID", kernel)
 }
 
 eng_ipython = function(options, kernel) {
   require(jsonlite)
 
-  result <- IPython.execute(kernel, options)
+  result <- IPython.execute_chunk(kernel, options)
   figure <- result$figure
   output <- result$output
   
@@ -50,6 +55,10 @@ eng_ipython = function(options, kernel) {
   # Collapse the stdout stream
   streams <- output[output$msg_type == "stream", ]
   out <- if (nrow(streams) > 0) streams$content$data else NULL
+
+  # We could also get the pyout stream so that you don't have to write
+  # print(foo). However, this also means that we'll see the the string
+  # representation of plt.plot in our output. Suggestions welcome.
   
   extra <- if (!is.null(figure)) {
     knit_hooks$get("plot")(figure, options)

@@ -100,17 +100,24 @@ class KnitrWrapper(object):
 
 
 if __name__ == "__main__":
-    options = loads(sys.stdin.read())
-    if type(options["code"]) in [str, unicode]:
-        options["code"] = [options["code"]]
-
     kw = KnitrWrapper(sys.argv[1])
-    output, figure = kw.execute(options)
 
-    with open(sys.argv[2], "w") as json_out:
-        dump({"output": output, "figure": figure}, json_out, cls=KnitrEncoder,
-             indent=4, separators=(",", ":"))
-        json_out.write("\n")
+    if sys.argv[2] == "chunk":
+        options = loads(sys.stdin.read())
+        if type(options["code"]) in [str, unicode]:
+            options["code"] = [options["code"]]
 
-    if DEBUG:
-        pprint(output)
+        output, figure = kw.execute(options)
+
+        with open(sys.argv[3], "w") as json_out:
+            dump({"output": output, "figure": figure}, json_out, cls=KnitrEncoder,
+                indent=4, separators=(",", ":"))
+            json_out.write("\n")
+
+        if DEBUG:
+            pprint(output)
+    else:
+        code = sys.argv[3]
+        if type(code) in [str, unicode]:
+            code = [code]
+        kw.execute_code(*code)
