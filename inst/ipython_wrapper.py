@@ -4,6 +4,7 @@ from json import dump, loads, JSONEncoder
 import os
 import sys
 from time import sleep
+from pprint import pprint
 from Queue import Empty
 
 from IPython import Config
@@ -61,8 +62,11 @@ class IPythonClient(object):
             "plt.cla()")
         self.execute_code(*code)
 
-    def save_figure(self, filename, dpi):
-        self.client.execute("plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
+    def save_figure(self, filename, dpi, width, height):
+        self.execute_code(
+            "plt.gcf().set_size_inches({0}, {1})".format(width, height),
+            "plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi),
+        )
 
     def execute_code(self, *lines):
         code = "\n".join(lines)
@@ -82,6 +86,7 @@ class IPythonClient(object):
         return output
 
     def execute(self, options):
+        pprint(options)
         code = options["code"]
         if "plt.plot(" in "\n".join(code):
             self.load_matplotlib(self.DEV_MAP[options["dev"]])
@@ -93,13 +98,13 @@ class IPythonClient(object):
 
         if figure:
             figure = options["fig.path"] + options["label"] + "." + options["dev"]
-            self.save_figure(figure, options["dpi"])
+            self.save_figure(figure, options["dpi"],
+                             options["fig.width"], options["fig.height"])
 
         return output, figure
 
 
 if __name__ == "__main__":
-    from pprint import pprint
     options = loads(sys.stdin.read())
     if type(options["code"]) in [str, unicode]:
         options["code"] = [options["code"]]
@@ -113,5 +118,4 @@ if __name__ == "__main__":
         json_out.write("\n")
 
     if DEBUG:
-        from pprint import pprint
         pprint(output)
