@@ -72,7 +72,7 @@ class IPythonClient(object):
         pprint(options)
         code = options["code"]
         if "plt.plot(" in "\n".join(code):
-            self.load_matplotlib(self.DEV_MAP[options["dev"]])
+            self.load_matplotlib(self.DEV_MAP.get(options["dev"], options["dev"]))
             figure = True
             output = self.execute_code(*code)
         else:
