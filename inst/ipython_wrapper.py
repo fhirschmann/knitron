@@ -22,7 +22,7 @@ class KnitrEncoder(JSONEncoder):
         return "__unserializable_python_object__"
 
 
-class IPythonClient(object):
+class KnitrWrapper(object):
     DEV_MAP = {
         "png": "AGG",
     }
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     if type(options["code"]) in [str, unicode]:
         options["code"] = [options["code"]]
 
-    client = IPythonClient(sys.argv[1])
-    output, figure = client.execute(options)
+    kw = KnitrWrapper(sys.argv[1])
+    output, figure = kw.execute(options)
 
     with open(sys.argv[2], "w") as json_out:
         dump({"output": output, "figure": figure}, json_out, cls=KnitrEncoder,
