@@ -37,10 +37,18 @@ IPython.terminate <- function(kernel) {
   message("Terminated IPython kernel with ID", kernel)
 }
 
+knitron_defaults <- function(options) {
+  defaults <- list(
+    knitron.autoplot = TRUE,
+    knitron.print = "auto"
+  )
+  append(defaults[!names(defaults) %in% names(options)], options)
+}
+
 eng_ipython = function(options, kernel) {
   require(jsonlite)
 
-  result <- IPython.execute_chunk(kernel, options)
+  result <- IPython.execute_chunk(kernel, knitron_defaults(options))
   figure <- result$figure
   output <- result$output
   
@@ -49,7 +57,8 @@ eng_ipython = function(options, kernel) {
   if (err != "") {
     message("Error executing the following code:")
     cat(options$code, err, sep="\n")
-    stop("Execution was stopped due to a IPython error")
+    if (!options$error)
+      stop("Execution was stopped due to a IPython error")
   }
   
   # Collapse the stdout stream
