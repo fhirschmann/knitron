@@ -41,9 +41,18 @@ class KnitrWrapper(object):
             "import matplotlib",
             "matplotlib.use('{0}')".format(backend),
             "import matplotlib.pyplot as plt",
-            "plt.clf()",
-            "plt.cla()")
+            "for fignum in plt.get_fignums():",
+            "   plt.close(fignum)")
         self.execute_code(*code)
+
+    def has_figure(self):
+        for msg in self.execute_code("bool(plt.get_fignums())"):
+            try:
+                return msg["content"]["data"]["text/plain"] == "True"
+            except KeyError:
+                pass
+
+        return False
 
     def save_figure(self, filename, dpi, width, height):
         self.execute_code(
@@ -71,20 +80,23 @@ class KnitrWrapper(object):
     def execute(self, options):
         pprint(options)
         code = options["code"]
-        if "plt.plot(" in "\n".join(code):
-            self.load_matplotlib(self.DEV_MAP.get(options["dev"], options["dev"]))
-            figure = True
-            output = self.execute_code(*code)
-        else:
-            figure = None
-            output = self.execute_code(*code)
 
-        if figure:
+        if "dev" in options:
+            self.load_matplotlib(self.DEV_MAP.get(options["dev"], options["dev"]))
+            output = self.execute_code(*code)
+            has_figure = self.has_figure()
+        else:
+            output = self.execute_code(*code)
+            has_figure = False
+
+        if has_figure:
             figure = options["fig.path"] + options["label"] + "." + options["dev"]
             self.save_figure(figure, options["dpi"],
                              options["fig.width"], options["fig.height"])
 
-        return output, figure
+            return output, figure
+
+        return output, None
 
 
 if __name__ == "__main__":
