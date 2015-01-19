@@ -21,6 +21,15 @@ class KnitrEncoder(JSONEncoder):
         return "__unserializable_python_object__"
 
 
+def auto_print(obj):
+    content = obj["content"]
+
+    if "matplotlib" in str(content):
+        return False
+
+    return True
+
+
 class KnitrWrapper(object):
     DEV_MAP = {
         "png": "AGG",
@@ -64,6 +73,9 @@ class KnitrWrapper(object):
                 msg = self.client.get_iopub_msg()
                 output.append(msg)
 
+                if msg["msg_type"] == "pyout":
+                    msg["print"] = auto_print(msg)
+
                 if msg["content"].get("execution_state", None) == "idle":
                     break
             except Empty:
@@ -75,11 +87,10 @@ class KnitrWrapper(object):
         if DEBUG:
             pprint(options)
 
-
         self.load_matplotlib(self.DEV_MAP.get(options["dev"], options["dev"]))
         output = self.execute_code(*options["code"])
 
-        if self.has_figure:
+        if options["knitron.autoplot"] and self.has_figure:
             figure = "{0[fig.path]}{0[label]}.{0[dev]}".format(options)
             self.save_figure(figure, options["dpi"],
                              options["fig.width"], options["fig.height"])

@@ -47,8 +47,9 @@ knitron_defaults <- function(options) {
 
 eng_ipython = function(options, kernel) {
   require(jsonlite)
-
-  result <- knitron.execute_chunk(kernel, knitron_defaults(options))
+  options <- knitron_defaults(options)
+  
+  result <- knitron.execute_chunk(kernel, options)
   figure <- result$figure
   output <- result$output
   
@@ -61,14 +62,19 @@ eng_ipython = function(options, kernel) {
       stop("Execution was stopped due to a IPython error")
   }
   
-  # Collapse the stdout stream
-  streams <- output[output$msg_type == "stream", ]
-  out <- if (nrow(streams) > 0) streams$content$data else NULL
-
-  # We could also get the pyout stream so that you don't have to write
-  # print(foo). However, this also means that we'll see the the string
-  # representation of plt.plot in our output. Suggestions welcome.
+  output <- output[output$msg_type %in% c("stream", "pyout"), ]
+  if (options$knitron.print == TRUE) {
+    # User overwrites automatic selection
+    output$print <- TRUE
+  } else {
+    # Always print stdout stream
+    output[output$msg_type == "stream", "print"] <- TRUE
+  }
   
+  out <- if (sum(output$print) > 0) {
+    output[output$print, ]$content$data
+  } else NULL
+    
   extra <- if (!is.null(figure)) {
     knit_hooks$get("plot")(figure, options)
   } else NULL
