@@ -45,7 +45,8 @@ eng_ipython = function(options, kernel) {
   out <- if (nrow(streams) > 0) streams$content$data else NULL
   
   extra <- if (!is.null(figure)) {
-    paste("![plot of chunk", options$label, "](", figure, ")", sep="")
+    #paste("![plot of chunk", options$label, "](", figure, ")", sep="")
+    knit_hooks$get("plot")(figure, options)
   } else NULL
   knitr::engine_output(options, options$code, out, extra)
 }
