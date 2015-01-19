@@ -75,6 +75,8 @@ class KnitrWrapper(object):
 
                 if msg["msg_type"] == "pyout":
                     msg["print"] = auto_print(msg)
+                elif msg["msg_type"] == "stream":
+                    msg["print"] = True
 
                 if msg["content"].get("execution_state", None) == "idle":
                     break
