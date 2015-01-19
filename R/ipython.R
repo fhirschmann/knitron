@@ -1,6 +1,3 @@
-ipython_wrapper <- system.file('python', 'ipython_wrapper.py', package='knitron')
-if (ipython_wrapper == "") ipython_wrapper <- "inst/ipython_wrapper.py"
-
 knitron.start <- function() {
   ipython_tmp <- tempfile()
 
@@ -18,19 +15,19 @@ knitron.start <- function() {
 
 knitron.execute_chunk <- function(kernel, code) {
   json_file = tempfile()
-  args = paste("--colors", "NoColor", ipython_wrapper, kernel, "chunk", json_file)
+  args = paste("--colors", "NoColor", knitron_wrapper, kernel, "chunk", json_file)
   system2("ipython", args, input = jsonlite::toJSON(code, auto_unbox = TRUE))
   jsonlite::fromJSON(readLines(json_file))
 }
 
 knitron.execute_code <- function(kernel, code) {
-  args = paste(ipython_wrapper, kernel, "code", code)
+  args = paste(knitron_wrapper, kernel, "code", code)
   system2("ipython", args)
 }
 
 knitron.terminate <- function(kernel) {
   knitron.execute_code(kernel, "quit")
-  message("Terminated IPython kernel with ID", kernel)
+  message(paste("Terminated IPython kernel with ID", kernel))
 }
 
 knitron_defaults <- function(options) {
@@ -77,10 +74,19 @@ eng_ipython = function(options, kernel) {
   knitr::engine_output(options, options$code, out, extra)
 }
 
-knitron <- function(knit_fun, ...) {
-  kernel <- knitron.start()
-  on.exit(knitron.terminate(kernel))
+.onLoad <- function(lib, pkg) {
+  knitron_wrapper <<- system.file('python', 'ipython_wrapper.py', package=pkg)
+  if (knitron_wrapper == "")
+    knitron_wrapper <<- "inst/ipython_wrapper.py"
+  
+  # We'll start a global kernel. Yes, this isn't pretty.
+  knitron_kernel <<- knitron.start()
+  knitr::knit_engines$set(ipython = function(options)
+    eng_ipython(options, kernel = knitron_kernel))
 
-  knitr::knit_engines$set(ipython = function(options) eng_ipython(options, kernel = kernel))
-  knit_fun(...)
+  invisible()
+}
+
+.onUnload <- function(lib, pkg) {
+  knitron.terminate(knitron_kernel)
 }
