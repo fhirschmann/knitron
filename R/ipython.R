@@ -1,5 +1,3 @@
-library(knitr)
-
 ipython_wrapper <- system.file('python', 'ipython_wrapper.py', package='knitron')
 if (ipython_wrapper == "") ipython_wrapper <- "inst/ipython_wrapper.py"
 
@@ -19,12 +17,10 @@ knitron.start <- function() {
 }
 
 knitron.execute_chunk <- function(kernel, code) {
-  require(jsonlite)
-  
   json_file = tempfile()
   args = paste("--colors", "NoColor", ipython_wrapper, kernel, "chunk", json_file)
-  system2("ipython", args, input = toJSON(code, auto_unbox = TRUE))
-  fromJSON(readLines(json_file))
+  system2("ipython", args, input = jsonlite::toJSON(code, auto_unbox = TRUE))
+  jsonlite::fromJSON(readLines(json_file))
 }
 
 knitron.execute_code <- function(kernel, code) {
@@ -46,7 +42,6 @@ knitron_defaults <- function(options) {
 }
 
 eng_ipython = function(options, kernel) {
-  require(jsonlite)
   options <- knitron_defaults(options)
   
   result <- knitron.execute_chunk(kernel, options)
@@ -59,23 +54,23 @@ eng_ipython = function(options, kernel) {
     message("Error executing the following code:")
     cat(options$code, err, sep="\n")
     if (!options$error)
-      stop("Execution was stopped due to a IPython error")
+      stop("Execution was stopped due to an IPython error")
   }
   
-  output <- output[output$msg_type %in% c("stream", "pyout"), ]
-  if (is.logical(options$knitron.print)) {
-    # User overwrites automatic selection
-    output[, "print"] <- options$knitron.print
-  }
-  
-  # Prepare out and extra for knitr
-  out <- if (sum(output$print) > 0) {
-    output[output$print, ]$content$data
+  filtered <- output[!is.na(output$print), ]
+  if ("pyout" %in% filtered$msg_type)
+    if (is.logical(options$knitron.print))
+      filtered[filtered$msg_type == "pyout", "print"] <- options$knitron.print
+
+  out <- if(sum(filtered$print) > 0) {
+    unname(filtered[filtered$print, , drop=F]$content$data)
   } else NULL
-    
+
   extra <- if (!is.null(figure)) {
     knit_hooks$get("plot")(figure, options)
   } else NULL
+  print(out)
+  print(extra)
 
   # We set the engine to python for further processing (highlighting)
   options$engine <- "python"
@@ -86,6 +81,6 @@ knitron <- function(knit_fun, ...) {
   kernel <- knitron.start()
   on.exit(knitron.terminate(kernel))
 
-  knit_engines$set(ipython = function(options) eng_ipython(options, kernel = kernel))
+  knitr::knit_engines$set(ipython = function(options) eng_ipython(options, kernel = kernel))
   knit_fun(...)
 }
