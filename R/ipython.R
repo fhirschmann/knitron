@@ -3,7 +3,7 @@ library(knitr)
 ipython_wrapper <- system.file('python', 'ipython_wrapper.py', package='knitron')
 if (ipython_wrapper == "") ipython_wrapper <- "inst/ipython_wrapper.py"
 
-IPython.start <- function() {
+knitron.start <- function() {
   ipython_tmp <- tempfile()
 
   # Start new kernel
@@ -18,7 +18,7 @@ IPython.start <- function() {
   kernel
 }
 
-IPython.execute_chunk <- function(kernel, code) {
+knitron.execute_chunk <- function(kernel, code) {
   require(jsonlite)
   
   json_file = tempfile()
@@ -27,13 +27,13 @@ IPython.execute_chunk <- function(kernel, code) {
   fromJSON(readLines(json_file))
 }
 
-IPython.execute_code <- function(kernel, code) {
+knitron.execute_code <- function(kernel, code) {
   args = paste(ipython_wrapper, kernel, "code", code)
   system2("ipython", args)
 }
 
-IPython.terminate <- function(kernel) {
-  IPython.execute_code(kernel, "quit")
+knitron.terminate <- function(kernel) {
+  knitron.execute_code(kernel, "quit")
   message("Terminated IPython kernel with ID", kernel)
 }
 
@@ -48,7 +48,7 @@ knitron_defaults <- function(options) {
 eng_ipython = function(options, kernel) {
   require(jsonlite)
 
-  result <- IPython.execute_chunk(kernel, knitron_defaults(options))
+  result <- knitron.execute_chunk(kernel, knitron_defaults(options))
   figure <- result$figure
   output <- result$output
   
@@ -79,8 +79,8 @@ eng_ipython = function(options, kernel) {
 }
 
 knitron <- function(knit_fun, ...) {
-  kernel <- IPython.start()
-  on.exit(IPython.terminate(kernel))
+  kernel <- knitron.start()
+  on.exit(knitron.terminate(kernel))
 
   knit_engines$set(ipython = function(options) eng_ipython(options, kernel = kernel))
   knit_fun(...)
