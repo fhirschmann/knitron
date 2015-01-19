@@ -23,24 +23,31 @@ IPython.execute <- function(kernel, code) {
   
   json_file = tempfile()
   args = paste("--colors", "NoColor", ipython_wrapper, kernel, json_file)
-  system2("ipython", args, input = code)
+  system2("ipython", args, input = toJSON(code))
   fromJSON(readLines(json_file))
 }
 
 IPython.terminate <- function(kernel) {
-  IPython.execute(kernel, "quit")
+  IPython.execute(kernel, list(code="quit"))
   message("Terminated IPython kernel with ID", kernel)
 }
 
 eng_ipython = function(options, kernel) {
   require(jsonlite)
+  print(options)
 
-  output <- IPython.execute(kernel, options$code)
+  result <- IPython.execute(kernel, options)
+  figure <- result$figure
+  output <- result$output
   
   # Collapse the stdout stream
-  streams <- paste(output[output$msg_type == "stream", ]$content$data, collapse="")
+  streams <- output[output$msg_type == "stream", ]
+  out <- if (nrow(streams) > 0) streams$content$data else NULL
   
-  knitr::engine_output(options, options$code, streams, extra = NULL)
+  extra <- if (!is.null(figure)) {
+    paste("![plot of chunk", options$label, "](", figure, ")", sep="")
+  } else NULL
+  knitr::engine_output(options, options$code, out, extra)
 }
 
 knitron <- function(knit_fun, ...) {

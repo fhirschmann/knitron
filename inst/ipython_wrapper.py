@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from json import dump, JSONEncoder
+from json import dump, loads, JSONEncoder
 import os
 import sys
 from time import sleep
@@ -38,16 +38,76 @@ def execute(code, client):
     return output
 
 
-if __name__ == "__main__":
-    config = Config(InteractiveApp={"colors": "NoColor"})
-    cf = find_connection_file(sys.argv[1])
-    client = BlockingKernelClient(config=config, connection_file=cf)
-    client.load_connection_file()
-    client.start_channels()
+class IPythonClient(object):
+    DEV_MAP = {
+        "png": "AGG",
+    }
 
-    output = execute(sys.stdin.read(), client)
+    def __init__(self, kernel, options, config=None):
+        if config is None:
+            config = Config(InteractiveApp={"colors": "NoColor"})
+
+        self.options = options
+
+        cf = find_connection_file(kernel)
+        self.client = BlockingKernelClient(config=config, connection_file=cf)
+        self.client.load_connection_file()
+        self.client.start_channels()
+
+    def load_matplotlib(self, backend):
+        code = [
+            "import matplotlib",
+            "matplotlib.use('{0}')".format(backend),
+            "import matplotlib.pyplot as plt",
+            "plt.clf()",
+            "plt.cla()"]
+        return code
+
+    def save_figure(self, filename, dpi):
+        self.client.execute("plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
+
+    def execute_code(self, *lines):
+        code = "\n".join(lines)
+        self.client.execute(code)
+        output = []
+
+        while True:
+            try:
+                msg = self.client.get_iopub_msg()
+                output.append(msg)
+
+                if msg["content"].get("execution_state", None) == "idle":
+                    break
+            except Empty:
+                sleep(0.1)
+
+        return output
+
+    def execute(self, options):
+        code = options["code"]
+        if "plt.plot(" in "\n".join(code):
+            load = self.load_matplotlib(self.DEV_MAP[options["dev"][0]])
+            figure = True
+            output = self.execute_code(*(load + code))
+        else:
+            figure = None
+            output = self.execute_code(*code)
+
+        if figure:
+            figure = options["fig.path"][0] + options["label"][0] + "." + options["dev"][0]
+            self.save_figure(figure, options["dpi"][0])
+
+        return output, figure
+
+
+if __name__ == "__main__":
+    from pprint import pprint
+    options = loads(sys.stdin.read())
+    client = IPythonClient(sys.argv[1], options)
+    output, figure = client.execute(options)
+
     with open(sys.argv[2], "w") as json_out:
-        dump(output, json_out, cls=KnitrEncoder,
+        dump({"output": output, "figure": figure}, json_out, cls=KnitrEncoder,
              indent=4, separators=(",", ":"))
         json_out.write("\n")
 
