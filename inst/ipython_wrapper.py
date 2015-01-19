@@ -7,7 +7,6 @@ from time import sleep
 from pprint import pprint
 from Queue import Empty
 
-from IPython import Config
 from IPython.kernel import BlockingKernelClient
 from IPython.lib.kernel import find_connection_file
 
@@ -27,24 +26,21 @@ class KnitrWrapper(object):
         "png": "AGG",
     }
 
-    def __init__(self, kernel, config=None):
-        if config is None:
-            config = Config(InteractiveApp={"colors": "NoColor"})
-
+    def __init__(self, kernel):
         cf = find_connection_file(kernel)
-        self.client = BlockingKernelClient(config=config, connection_file=cf)
+        self.client = BlockingKernelClient(connection_file=cf)
         self.client.load_connection_file()
         self.client.start_channels()
 
     def load_matplotlib(self, backend):
-        code = (
+        self.execute_code(
             "import matplotlib",
             "matplotlib.use('{0}')".format(backend),
             "import matplotlib.pyplot as plt",
             "for fignum in plt.get_fignums():",
             "   plt.close(fignum)")
-        self.execute_code(*code)
 
+    @property
     def has_figure(self):
         for msg in self.execute_code("bool(plt.get_fignums())"):
             try:
@@ -57,12 +53,10 @@ class KnitrWrapper(object):
     def save_figure(self, filename, dpi, width, height):
         self.execute_code(
             "plt.gcf().set_size_inches({0}, {1})".format(width, height),
-            "plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi),
-        )
+            "plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
 
     def execute_code(self, *lines):
-        code = "\n".join(lines)
-        self.client.execute(code)
+        self.client.execute("\n".join(lines))
         output = []
 
         while True:
@@ -78,19 +72,15 @@ class KnitrWrapper(object):
         return output
 
     def execute(self, options):
-        pprint(options)
-        code = options["code"]
+        if DEBUG:
+            pprint(options)
 
-        if "dev" in options:
-            self.load_matplotlib(self.DEV_MAP.get(options["dev"], options["dev"]))
-            output = self.execute_code(*code)
-            has_figure = self.has_figure()
-        else:
-            output = self.execute_code(*code)
-            has_figure = False
 
-        if has_figure:
-            figure = options["fig.path"] + options["label"] + "." + options["dev"]
+        self.load_matplotlib(self.DEV_MAP.get(options["dev"], options["dev"]))
+        output = self.execute_code(*options["code"])
+
+        if self.has_figure:
+            figure = "{0[fig.path]}{0[label]}.{0[dev]}".format(options)
             self.save_figure(figure, options["dpi"],
                              options["fig.width"], options["fig.height"])
 
