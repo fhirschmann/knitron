@@ -43,11 +43,10 @@ class IPythonClient(object):
         "png": "AGG",
     }
 
-    def __init__(self, kernel, options, config=None):
+    def __init__(self, kernel, config=None):
         if config is None:
             config = Config(InteractiveApp={"colors": "NoColor"})
 
-        self.options = options
 
         cf = find_connection_file(kernel)
         self.client = BlockingKernelClient(config=config, connection_file=cf)
@@ -61,7 +60,7 @@ class IPythonClient(object):
             "import matplotlib.pyplot as plt",
             "plt.clf()",
             "plt.cla()"]
-        return code
+        self.execute_code(*code)
 
     def save_figure(self, filename, dpi):
         self.client.execute("plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
@@ -86,9 +85,9 @@ class IPythonClient(object):
     def execute(self, options):
         code = options["code"]
         if "plt.plot(" in "\n".join(code):
-            load = self.load_matplotlib(self.DEV_MAP[options["dev"][0]])
+            self.load_matplotlib(self.DEV_MAP[options["dev"][0]])
             figure = True
-            output = self.execute_code(*(load + code))
+            output = self.execute_code(*code)
         else:
             figure = None
             output = self.execute_code(*code)
@@ -103,7 +102,7 @@ class IPythonClient(object):
 if __name__ == "__main__":
     from pprint import pprint
     options = loads(sys.stdin.read())
-    client = IPythonClient(sys.argv[1], options)
+    client = IPythonClient(sys.argv[1])
     output, figure = client.execute(options)
 
     with open(sys.argv[2], "w") as json_out:
@@ -112,5 +111,6 @@ if __name__ == "__main__":
         json_out.write("\n")
 
     if DEBUG:
+        print("asf")
         from pprint import pprint
         pprint(output)
