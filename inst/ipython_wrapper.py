@@ -60,6 +60,9 @@ class KnitrWrapper(object):
         return False
 
     def save_figure(self, filename, dpi, width, height):
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename))
+
         self.execute_code(
             "plt.gcf().set_size_inches({0}, {1})".format(width, height),
             "plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
