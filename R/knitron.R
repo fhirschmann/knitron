@@ -74,6 +74,12 @@ knitron.terminate <- function(kernel) {
 eng_ipython = function(options) {
   koptions <- .knitron_defaults(options)
   
+  # We set the engine to python for further processing (highlighting),
+  options$engine <- "python"
+
+  if (paste(options$code, sep = "", collapse = "") == "")
+    return(knitr::engine_output(options, options$code, NULL, NULL))
+  
   result <- knitron.execute_chunk(koptions, .knitron_env$knitron_kernel)
   figure <- result$figure
   output <- result$output
@@ -94,14 +100,12 @@ eng_ipython = function(options) {
       filtered[filtered$msg_type == "pyout", "print"] <- koptions$knitron.print
 
   out <- if(sum(filtered$print) > 0) {
-    unname(filtered[filtered$print, , drop=F]$content$data)
+    unname(unlist(filtered[filtered$print, , drop=F]$content$data))
   } else NULL
 
   extra <- if (!is.null(figure)) {
     knitr::knit_hooks$get("plot")(figure, options)
   } else NULL
 
-  # We set the engine to python for further processing (highlighting),
-  options$engine <- "python"
   knitr::engine_output(options, options$code, out, extra)
 }
