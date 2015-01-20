@@ -14,11 +14,11 @@ knitron.start <- function(persist = FALSE) {
   
   kernel <- as.integer(gsub("\\D", "", grep("--existing",
                                             readLines(ipython_tmp), value = TRUE)))
-  message(paste("Started IPython kernel with ID", kernel))
+  message(paste("Knitron: Started IPython kernel with ID", kernel))
 
   # Keep a list so that we can kill the kernels later (if persist is FALSE)
   if (!persist)
-    knitron_env$kernels <- append(knitron_env$kernels, kernel)
+    .knitron_env$kernels <- append(.knitron_env$kernels, kernel)
   
   kernel
 }
@@ -31,16 +31,20 @@ knitron.start <- function(persist = FALSE) {
 #' @export
 knitron.execute_chunk <- function(options, kernel = NULL) {
   json_file <- tempfile()
-  args <- paste(knitron_env$knitron_wrapper,
-                if (is.null(kernel)) knitron_env$gkernel else kernel,
+  args <- paste(.knitron_env$knitron_wrapper,
+                if (is.null(kernel)) .knitron_env$gkernel else kernel,
                 "chunk", json_file)
   system2("ipython", args, input = jsonlite::toJSON(options, auto_unbox = TRUE))
   jsonlite::fromJSON(readLines(json_file))
 }
 
+#' Execute a single Python command
+#' @param code the command to execute
+#' @param kernel the kernel ID to use
+#' @export
 knitron.execute_code <- function(code, kernel = NULL) {
-  args <- paste(knitron_env$knitron_wrapper, kernel,
-                if (is.null(kernel)) knitron_env$gkernel else kernel,
+  args <- paste(.knitron_env$knitron_wrapper, kernel,
+                if (is.null(kernel)) .knitron_env$gkernel else kernel,
                 "code", code)
   system2("ipython", args, wait = TRUE)
 }
@@ -50,11 +54,11 @@ knitron.execute_code <- function(code, kernel = NULL) {
 #' @param kernel the kernel ID
 #' @export
 knitron.terminate <- function(kernel) {
-  pskill(kernel)
-  message(paste("Terminated kernel with ID", kernel))
+  tools::pskill(kernel)
+  message(paste("Knitron: Terminated kernel with ID", kernel))
 }
 
-knitron_defaults <- function(options) {
+.knitron_defaults <- function(options) {
   defaults <- list(
     knitron.autoplot = TRUE,
     knitron.print = "auto"
@@ -68,9 +72,9 @@ knitron_defaults <- function(options) {
 #' @return output for knitr
 #' @export
 eng_ipython = function(options) {
-  koptions <- knitron_defaults(options)
+  koptions <- .knitron_defaults(options)
   
-  result <- knitron.execute_chunk(koptions, knitron_env$knitron_kernel)
+  result <- knitron.execute_chunk(koptions, .knitron_env$knitron_kernel)
   figure <- result$figure
   output <- result$output
   
@@ -78,10 +82,10 @@ eng_ipython = function(options) {
   err <- paste(output[output$msg_type == "pyerr", ]$content$traceback[[1]],
                collapse="\n")
   if (err != "") {
-    message("Error executing the following code:")
+    message("Knitron: Error executing the following code:")
     cat(koptions$code, err, sep="\n")
     if (!koptions$error)
-      stop("Execution was stopped due to an IPython error")
+      stop("Knitron: Execution was stopped due to an IPython error")
   }
   
   filtered <- output[!is.na(output$print), ]
@@ -94,7 +98,7 @@ eng_ipython = function(options) {
   } else NULL
 
   extra <- if (!is.null(figure)) {
-    knit_hooks$get("plot")(figure, options)
+    knitr::knit_hooks$get("plot")(figure, options)
   } else NULL
 
   # We set the engine to python for further processing (highlighting),
@@ -102,27 +106,27 @@ eng_ipython = function(options) {
   knitr::engine_output(options, options$code, out, extra)
 }
 
-knitron_env <- new.env(parent = emptyenv())
-knitron_env$kernels <- c()
+.knitron_env <- new.env(parent = emptyenv())
+.knitron_env$kernels <- c()
 
 .knitr.finalizer <- function(obj) {
-  sapply(obj$knitron_env$kernels, knitron.terminate)
+  sapply(obj$.knitron_env$kernels, knitron.terminate)
 }
 
 .onLoad <- function(lib, pkg) {
   knitron_wrapper <- system.file('python', 'ipython_wrapper.py', package=pkg)
   if (knitron_wrapper == "")
     knitron_wrapper <- "inst/ipython_wrapper.py"
-  assign("knitron_wrapper", knitron_wrapper, envir = knitron_env)
+  assign("knitron_wrapper", knitron_wrapper, envir = .knitron_env)
   
   # We'll start a global kernel lazily. Yes, this isn't pretty.
-  delayedAssign("gkernel", knitron.start(FALSE), assign.env = knitron_env)
+  delayedAssign("gkernel", knitron.start(FALSE), assign.env = .knitron_env)
 
   # Kill all kernels when an R session ends.
   reg.finalizer(parent.env(environment()), .knitr.finalizer, onexit = TRUE)
   
   # Register this engine with knitr,
-  knit_engines$set(ipython = eng_ipython)
+  knitr::knit_engines$set(ipython = eng_ipython)
 }
 
 .onUnload <- function(lib, pkg) {

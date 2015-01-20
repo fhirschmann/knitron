@@ -3,10 +3,12 @@ Type: Package
 Title: Brings IPython and matplotlib to knitr
 Version: 0.1
 Date: 2015-01-19
-Author: Fabian Hirschmann
+Authors@R: c(
+    person("Fabian", "Hirschmann", email = "fabian@hirschmann.email", role = c("aut", "cre"))
+    )
 Maintainer: Fabian Hirschmann <fabian@hirschmann.email>
 Description: This packages integrates IPython and matplotlib into Knitr.
-License: MIT
+License: GPL-2
 URL: http://github.com/fhirschmann/knitron
 BugReports: https://github.com/fhirschmann/knitron/issues
 Depends: 
@@ -17,5 +19,3 @@ Imports:
     tools
 Suggests: 
     testthat(>= 0.9),
-    knitr
-VignetteBuilder: knitr
