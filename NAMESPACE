@@ -1,3 +1,4 @@
 exportPattern("^[[:alpha:]]+")
 importFrom(jsonlite, toJSON)
 importFrom(jsonlite, fromJSON)
+importFrom(tools, pskill)

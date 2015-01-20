@@ -13,6 +13,7 @@ Depends:
     R (>= 2.14.1),
     knitr (>= 1.8)
 Imports:
-    jsonlite(>= 0.9.13)
+    jsonlite(>= 0.9.13),
+    tools
 Suggests:
     testthat(>= 0.9)
