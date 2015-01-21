@@ -3,16 +3,16 @@ Use IPython in knitr!
 
 Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/knitr/).
 
-Currently a work in progress, it is already usable
+Currently a work in progress; it is already usable.
 
-# Installation
+## Installation
 
 ```r
 library(devtools)
 install_github("knitron", "fhirschmann")
 ```
 
-# Usage
+## Usage
 
 ```r
 library(knitron)
