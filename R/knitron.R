@@ -73,6 +73,8 @@ knitron.terminate <- function(kernel) {
 #' @export
 eng_ipython = function(options) {
   koptions <- .knitron_defaults(options)
+  koptions$knitron.fig.path <- fig_path(options$dev, options, NULL)
+  koptions$knitron.base.dir <- knitr::opts_knit$get("base.dir")
   
   # We set the engine to python for further processing (highlighting),
   options$engine <- "python"

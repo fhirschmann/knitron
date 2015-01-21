@@ -60,10 +60,8 @@ class KnitrWrapper(object):
         return False
 
     def save_figure(self, filename, dpi, width, height):
-        if not os.path.exists(os.path.dirname(filename)):
-            os.makedirs(os.path.dirname(filename))
-
         self.execute_code(
+            "os.makedirs(os.path.dirname('{0}'))".format(filename),
             "plt.gcf().set_size_inches({0}, {1})".format(width, height),
             "plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
 
@@ -96,7 +94,7 @@ class KnitrWrapper(object):
         output = self.execute_code(*options["code"])
 
         if options["knitron.autoplot"] and self.has_figure:
-            figure = "{0[fig.path]}{0[label]}.{0[dev]}".format(options)
+            figure = options["knitron.fig.path"]
             self.save_figure(figure, options["dpi"],
                              options["fig.width"], options["fig.height"])
 
@@ -110,6 +108,11 @@ if __name__ == "__main__":
 
     if sys.argv[2] == "chunk":
         options = loads(sys.stdin.read())
+
+        # This isn't perfect, we should restore the cwd
+        if options.get("knitron.base.dir", None):
+            kw.execute_code("import os", "os.chdir('{0}')".format(options["knitron.base.dir"]))
+
         if type(options["code"]) in [str, unicode]:
             options["code"] = [options["code"]]
 
