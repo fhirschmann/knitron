@@ -129,14 +129,17 @@ class Knitron(object):
 
 
 if __name__ == "__main__":
+    # Usage:
+    #   knitron.py KERNEL_ID chunk JSON_OUTPUT << JSON_INPUT
+    #   knitron.py KERNEL_ID code COMMAND
     kw = Knitron(sys.argv[1])
 
     if sys.argv[2] == "chunk":
         options = loads(sys.stdin.read())
 
-        # This isn't perfect, we should restore the cwd
         if options.get("knitron.base.dir", None):
-            kw.execute("import os", "os.chdir('{0}')".format(options["knitron.base.dir"]))
+            kw.execute("import os", "os.chdir('{0}')".format(
+                options["knitron.base.dir"]))
             curdir = kw.execute("import os", "os.getcwd()")[2][0][1:-1]
         else:
             curdir = None
@@ -155,12 +158,13 @@ if __name__ == "__main__":
                 filename = (options["knitron.fig.path"] + "-" + str(fignum) +
                             "." + options["dev"])
                 figure = options["knitron.fig.path"]
-                kw.save_figure(fignum, filename, options["dpi"], options["fig.width"],
-                               options["fig.height"])
+                kw.save_figure(fignum, filename, options["dpi"],
+                               options["fig.width"], options["fig.height"])
                 figures.append(filename)
 
         with open(sys.argv[3], "w") as json_out:
-            dump({"stdout": stdout, "stderr": stderr, "text": text, "figures": figures},
+            dump({"stdout": stdout, "stderr": stderr,
+                  "text": text, "figures": figures},
                  json_out, indent=4, separators=(",", ":"))
             json_out.write("\n")
 
@@ -171,4 +175,5 @@ if __name__ == "__main__":
         code = sys.argv[3]
         if type(code) in [str, unicode]:
             code = [code]
-        kw.execute_code(*code)
+        output = kw.execute_code(*code)
+        print("".join("\n".join(output)))
