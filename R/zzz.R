@@ -7,7 +7,7 @@
 
 .onLoad <- function(lib, pkg) {
   delayedAssign("knitron_wrapper",
-                system.file("ipython_wrapper.py", package="knitron", mustWork = TRUE),
+                system.file("knitron.py", package="knitron", mustWork = TRUE),
                 assign.env = .knitron_env)
   
   # We'll start a global kernel lazily. Yes, this isn't pretty.

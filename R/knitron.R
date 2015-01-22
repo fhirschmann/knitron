@@ -61,10 +61,16 @@ knitron.terminate <- function(kernel) {
 .knitron_defaults <- function(options) {
   defaults <- list(
     knitron.autoplot = TRUE,
+    knitron.matplotlib = TRUE,
     knitron.print = "auto"
   )
   append(defaults[!names(defaults) %in% names(options)], options)
 }
+
+.auto_print <- function(text) {
+  !grepl("matplotlib", text)
+}
+
 
 #' An IPython engine that gets registered with knitr
 #' 
@@ -73,7 +79,7 @@ knitron.terminate <- function(kernel) {
 #' @export
 eng_ipython = function(options) {
   koptions <- .knitron_defaults(options)
-  koptions$knitron.fig.path <- fig_path(options$dev, options, NULL)
+  koptions$knitron.fig.path <- fig_path("", options, NULL)
   koptions$knitron.base.dir <- knitr::opts_knit$get("base.dir")
   
   # We set the engine to python for further processing (highlighting),
@@ -83,31 +89,13 @@ eng_ipython = function(options) {
     return(knitr::engine_output(options, options$code, NULL, NULL))
   
   result <- knitron.execute_chunk(koptions, .knitron_env$knitron_kernel)
-  figure <- result$figure
-  output <- result$output
-  
-  # Print errors
-  err <- paste(output[output$msg_type == "pyerr", ]$content$traceback[[1]],
-               collapse="\n")
-  if (err != "") {
-    message("Knitron: Error executing the following code:")
-    cat(koptions$code, err, sep="\n")
-    if (!koptions$error)
-      stop("Knitron: Execution was stopped due to an IPython error")
-  }
-  
-  filtered <- output[!is.na(output$print), ]
-  if ("pyout" %in% filtered$msg_type)
-    if (is.logical(koptions$knitron.print))
-      filtered[filtered$msg_type == "pyout", "print"] <- koptions$knitron.print
 
-  out <- if(sum(filtered$print) > 0) {
-    unname(unlist(filtered[filtered$print, , drop=F]$content$data))
-  } else NULL
+  out <- paste(result$stdout, result$stderr,
+               if (koptions$knitron.print == TRUE |
+                     (koptions$knitron.print == "auto" & .auto_print(result$text))) {
+                 result$text
+               }, sep = "")
 
-  extra <- if (!is.null(figure)) {
-    knitr::knit_hooks$get("plot")(figure, options)
-  } else NULL
-
+  extra <- sapply(result$figures, function(f) knitr::knit_hooks$get("plot")(f, options))
   knitr::engine_output(options, options$code, out, extra)
 }
