@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from json import dump, loads, JSONEncoder
+from json import dump, loads
 import os
 import sys
 from time import sleep
@@ -14,17 +14,35 @@ DEBUG = bool(os.environ.get("DEBUG", False))
 
 
 class Knitron(object):
+    """
+    Two-way communication with an existing IPython kernel to be used
+    in the dynamic report generation framework knitr.
+    """
     DEV_MAP = {
         "png": "AGG",
     }
 
     def __init__(self, kernel):
+        """
+        :param kernel: the kernel id (process id)
+        :type kernel: integer
+        """
         cf = find_connection_file(kernel)
         self.client = BlockingKernelClient(connection_file=cf)
         self.client.load_connection_file()
         self.client.start_channels()
 
     def execute(self, *lines, **kwargs):
+        """
+        Execute code initialized kernel.
+
+        :param lines: lines to execute
+        :type lines: strings
+        :param print_errors: print remote errors
+        :type print_errors: boolean
+        :returns: (stdout, stderr, text) where text is text output
+                  of msg_type == 'pyout'
+        """
         code = "\n".join(lines)
         wait_for = self.client.execute(code)
 
@@ -60,6 +78,12 @@ class Knitron(object):
         return stdout, stderr, text
 
     def load_matplotlib(self, backend):
+        """
+        Loads matplotlib into the kernel.
+
+        :param backend: backend to use (e.g. AGG)
+        :type backend: str
+        """
         _, stderr, _ = self.execute(
             "import matplotlib",
             "matplotlib.use('{0}')".format(self.DEV_MAP.get(backend, backend)),
@@ -69,6 +93,9 @@ class Knitron(object):
 
     @property
     def figures(self):
+        """
+        List of figures in the pylab state machine.
+        """
         res = self.execute("','.join(map(str, plt.get_fignums()))")
         try:
             return map(int, res[2][0][1:-1].split(","))
@@ -76,6 +103,20 @@ class Knitron(object):
             return []
 
     def save_figure(self, fignum, filename, dpi, width, height):
+        """
+        Save a figure to a file.
+
+        :param fignum: the figure number
+        :type fignum: int
+        :param filename: file name to save to
+        :type filename: str
+        :param dpi: dots per inch
+        :type dpi: int
+        :param width: height in inches
+        :type width: int
+        :param height: height in inches
+        :type height int
+        """
         dirname = os.path.dirname(filename)
 
         self.execute(
@@ -111,10 +152,11 @@ if __name__ == "__main__":
         figures = []
         if options["knitron.matplotlib"] and options["knitron.autoplot"]:
             for fignum in kw.figures:
-                filename = options["knitron.fig.path"] + "-" + str(fignum) + "." + options["dev"]
+                filename = (options["knitron.fig.path"] + "-" + str(fignum) +
+                            "." + options["dev"])
                 figure = options["knitron.fig.path"]
                 kw.save_figure(fignum, filename, options["dpi"], options["fig.width"],
-                            options["fig.height"])
+                               options["fig.height"])
                 figures.append(filename)
 
         with open(sys.argv[3], "w") as json_out:
