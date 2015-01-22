@@ -13,14 +13,6 @@ from IPython.lib.kernel import find_connection_file
 DEBUG = bool(os.environ.get("DEBUG", False))
 
 
-class KnitrEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, (list, dict, str, unicode, int, float, bool, type(None))):
-            if isinstance(obj, str):
-                return JSONEncoder.default(self, obj)
-        return "__unserializable_python_object__"
-
-
 class Knitron(object):
     DEV_MAP = {
         "png": "AGG",
@@ -127,7 +119,7 @@ if __name__ == "__main__":
 
         with open(sys.argv[3], "w") as json_out:
             dump({"stdout": stdout, "stderr": stderr, "text": text, "figures": figures},
-                 json_out, cls=KnitrEncoder, indent=4, separators=(",", ":"))
+                 json_out, indent=4, separators=(",", ":"))
             json_out.write("\n")
 
         if curdir:
