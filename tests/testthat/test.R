@@ -2,7 +2,7 @@ run_knit <- function(code, echo = FALSE, strip = TRUE, ...) {
   tmp <- tempfile(pattern = "knitron.test.")
   dir.create(tmp)
   opts_knit$set(base.dir = tmp)
-  #on.exit(unlink(tmp, recursive = TRUE))
+  on.exit(unlink(tmp, recursive = TRUE))
 
   options <- c(..., echo = echo)
   args <- if (length(options) == 0)
@@ -26,6 +26,18 @@ run_knit <- function(code, echo = FALSE, strip = TRUE, ...) {
     list(out = out, files = files)
 }
 
+test_that("Matplotlib is not loaded", {
+  expect_equal(run_knit("import sys; 'matplotlib' in sys.modules", knitron.matplotlib = FALSE)$out, "False")
+})
+
+test_that("Matplotlib is loaded", {
+  expect_equal(run_knit("import sys; 'matplotlib' in sys.modules")$out, "True")
+})
+
+test_that("Waiting for code exeuction", {
+  expect_equal(run_knit("from time import sleep; sleep(4); 4")$out, "4")
+})
+
 test_that("Implicit printing: automatic", {
   expect_equal(run_knit(4, echo = TRUE), list(out = "python\n4\n4", files = character(0)))
   expect_equal(run_knit(4, echo = FALSE), list(out = "4", files = character(0)))
@@ -37,10 +49,6 @@ test_that("Implicit printing: off", {
 
 test_that("Empty input outputs empty output", {
   expect_equal(run_knit(""), list(out = "", files = character(0)))
-})
-
-test_that("Matplotlib is loaded", {
-  expect_equal(run_knit("import sys; 'matplotlib' in sys.modules")$out, "True")
 })
 
 test_that("Plot is created", {
