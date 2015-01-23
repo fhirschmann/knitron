@@ -79,6 +79,7 @@ knitron.terminate <- function(kernel) {
 #' @param options an knitr option list
 #' @return output for knitr
 #' @export
+#' @import knitr
 eng_ipython = function(options) {
   koptions <- .knitron_defaults(options)
   koptions$knitron.fig.path <- fig_path("", options, NULL)
