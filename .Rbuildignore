@@ -1,5 +1,7 @@
 ^.*\.Rproj$
+^.*\.pyc$
 ^\.Rproj\.user$
 ^README\.Rmd$
 Makefile$
+^figure
 ^\.travis\.yml$
