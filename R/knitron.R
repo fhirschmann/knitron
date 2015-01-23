@@ -68,7 +68,9 @@ knitron.terminate <- function(kernel) {
 }
 
 .auto_print <- function(text) {
-  !grepl("matplotlib", text)
+  if (length(text) == 0)
+    FALSE
+  else !grepl("matplotlib", text)
 }
 
 
@@ -89,6 +91,7 @@ eng_ipython = function(options) {
     return(knitr::engine_output(options, options$code, NULL, NULL))
   
   result <- knitron.execute_chunk(koptions, .knitron_env$knitron_kernel)
+  print(result)
 
   out <- paste(result$stdout, result$stderr,
                if (koptions$knitron.print == TRUE |
