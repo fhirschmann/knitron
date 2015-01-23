@@ -1,4 +1,4 @@
-# knitron
+# knitron: knitr + IPython + matplotlib
 Use IPython in knitr!
 
 Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/knitr/).
