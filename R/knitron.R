@@ -73,7 +73,6 @@ knitron.terminate <- function(kernel) {
   else !grepl("matplotlib", text)
 }
 
-
 #' An IPython engine that gets registered with knitr
 #' 
 #' @param options an knitr option list

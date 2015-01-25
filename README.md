@@ -18,7 +18,29 @@ install_github("knitron", "fhirschmann")
 library(knitron)
 ```
 
-That's it! Now you can use IPython in knitr using the `engine = 'ipython'` option.
+That's it! Now you can use IPython in knitr using the `engine = 'ipython'` option
+(see the [source code](https://github.com/fhirschmann/knitron/blob/master/README.Rmd)
+of this page for an example).
+
+Knitron brings workspace-like interaction for Python to knitr, so you can define
+a variable in one chunk
+
+
+```python
+x = 5
+```
+
+and access it in a following chunck
+
+
+```python
+5 + 1
+```
+
+```
+## 6
+```
+
 
 ## Examples
 
