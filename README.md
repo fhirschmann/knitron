@@ -19,7 +19,7 @@ library(knitron)
 ```
 
 That's it! Now you can use IPython in knitr using the `engine = 'ipython'` option
-(see the [source code](https://github.com/fhirschmann/knitron/blob/master/README.Rmd)
+(see the [source code](https://raw.githubusercontent.com/fhirschmann/knitron/master/README.Rmd)
 of this page for an example).
 
 Knitron brings workspace-like interaction for Python to knitr, so you can define
@@ -41,6 +41,19 @@ and access it in a following chunck
 ## 6
 ```
 
+### Supported Features and Limitations
+
+Most of the original knitr features are supported, including
+
+- fig.path
+- fig.width and fig.height
+- dpi
+- dev ('pdf' for LaTeX and 'png' for HTML/markdown)
+
+However, there are limitations of features that are
+not supported:
+
+- fig.show only supports 'hold', i.e. all figures are placed at the end of the code chunk
 
 ## Examples
 
