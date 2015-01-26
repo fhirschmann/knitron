@@ -54,7 +54,43 @@ However, there are limitations to some options:
 
 - fig.show only supports 'hold', i.e. all figures are placed at the end of the code chunk
 
+IPython's magic functions are supported too, of course. But there are
+some limitations, i.e. magic functions that insert text into the IPython
+shell like `%load` without executing them don't work. Likewise, magics
+that are meant for interaction like `%man` and `%edit` cannot work in
+knitr.
+
 ## Examples
+
+## IPython
+
+
+```python
+from time import sleep
+
+%time sleep(0.5)
+```
+
+```
+## CPU times: user 0 ns, sys: 2 ms, total: 2 ms
+## Wall time: 501 ms
+```
+
+
+```python
+%whos
+```
+
+```
+## Variable     Type                          Data/Info
+## ----------------------------------------------------
+## matplotlib   module                        <module 'matplotlib' from<...>matplotlib/__init__.pyc'>
+## plt          module                        <module 'matplotlib.pyplo<...>7/matplotlib/pyplot.pyc'>
+## sleep        builtin_function_or_method    <built-in function sleep>
+## x            int                           5
+```
+
+### Matplotlib
 
 
 ```python
