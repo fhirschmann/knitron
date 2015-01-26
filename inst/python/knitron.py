@@ -86,6 +86,7 @@ class Knitron(object):
         """
         _, stderr, _ = self.execute(
             "import matplotlib",
+            "matplotlib.interactive(False)",
             "matplotlib.use('{0}')".format(self.DEV_MAP.get(backend, backend)),
             "import matplotlib.pyplot as plt",
             "for fignum in plt.get_fignums():",

@@ -57,7 +57,7 @@ However, there are limitations to some options:
 IPython's magic functions are supported too, of course. But there are
 some limitations, i.e. magic functions that insert text into the IPython
 shell like `%load` without executing them don't work. Likewise, magics
-that are meant for interaction like `%man` and `%edit` cannot work in
+that are meant for interaction use like `%man` and `%edit` cannot work in
 knitr.
 
 ## Examples
@@ -72,7 +72,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 0 ns, sys: 2 ms, total: 2 ms
+## CPU times: user 1 ms, sys: 0 ns, total: 1 ms
 ## Wall time: 501 ms
 ```
 
