@@ -72,7 +72,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 1 ms, sys: 0 ns, total: 1 ms
+## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
 ## Wall time: 501 ms
 ```
 
@@ -116,3 +116,20 @@ for s in shift:
 
 
 ![plot of chunk example2](figure/example2-1.png) 
+
+## Sympy
+
+
+```python
+import sympy as sm
+
+x, y, z = sm.symbols("x y z")
+sm.solve([x * y - 7, x + y - 6], [x, y])
+```
+
+```
+## [(-sqrt(2) + 3, sqrt(2) + 3), (sqrt(2) + 3, -sqrt(2) + 3)]
+```
+
+Of course, you could also use `sm.latex` and `results = 'asis'` in
+TeX documents.
