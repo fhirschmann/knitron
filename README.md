@@ -43,15 +43,14 @@ and access it in a following chunck
 
 ### Supported Features and Limitations
 
-Most of the original knitr features are supported, including
+Most of the original knitr chunk options are supported, including
 
-- fig.path
-- fig.width and fig.height
-- dpi
-- dev ('pdf' for LaTeX and 'png' for HTML/markdown)
+- `fig.path`
+- `fig.width` and `fig.height`
+- `dpi`
+- `dev` ('pdf' for LaTeX and 'png' for HTML/markdown)
 
-However, there are limitations of features that are
-not supported:
+However, there are limitations to some options:
 
 - fig.show only supports 'hold', i.e. all figures are placed at the end of the code chunk
 
