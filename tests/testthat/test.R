@@ -62,7 +62,7 @@ test_that("[markdown] Plot is created", {
 
 test_that("[latex] Plot is created", {
   res <- run_knit("plt.plot([1, 2, 3])", latex = TRUE)
-  expect_true(grepl("includegraphics.*figure/unnamed-chunk-1-1", res$out))
+  expect_match(res$out, "includegraphics.*figure/unnamed-chunk-1-1")
   expect_equal(res$files, "figure/unnamed-chunk-1-1.pdf")
 })
 
@@ -78,6 +78,6 @@ test_that("[latex] Two plots are created", {
   res <- run_knit(paste("x = plt.figure(); x1 = x.add_subplot(111); x1.plot([1, 2, 3])",
                         "y = plt.figure(); y1 = y.add_subplot(111); y1.plot([5, 6])", sep="\n"),
                   latex = TRUE)
-  expect_true(grepl("includegraphics.*figure/unnamed-chunk-1-1.*includegraphics.*figure/unnamed-chunk-1-2", res$out))
+  expect_match(res$out, "includegraphics.*figure/unnamed-chunk-1-1.*includegraphics.*figure/unnamed-chunk-1-2")
   expect_equal(res$files, c("figure/unnamed-chunk-1-1.pdf", "figure/unnamed-chunk-1-2.pdf"))
 })
