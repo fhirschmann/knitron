@@ -1,5 +1,4 @@
 # knitron: knitr + IPython + matplotlib
-Use IPython in knitr!
 
 Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/knitr/).
 
@@ -72,7 +71,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
+## CPU times: user 1 ms, sys: 0 ns, total: 1 ms
 ## Wall time: 501 ms
 ```
 
