@@ -2,7 +2,7 @@
 .knitron_env$kernels <- c()
 
 .knitr.finalizer <- function(obj) {
-  sapply(obj$.knitron_env$kernels, knitron.terminate)
+  sapply(obj$.knitron_env$kernels, tools::pskill)
 }
 
 .onLoad <- function(lib, pkg) {
