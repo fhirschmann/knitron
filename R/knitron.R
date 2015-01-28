@@ -34,7 +34,7 @@ knitron.execute_chunk <- function(options, kernel = NULL) {
   args <- paste(.knitron_env$knitron_wrapper,
                 if (is.null(kernel)) .knitron_env$gkernel else kernel,
                 "chunk", json_file)
-  system2("python", args, input = jsonlite::toJSON(options, auto_unbox = TRUE))
+  system2("ipython", args, input = jsonlite::toJSON(options, auto_unbox = TRUE))
   jsonlite::fromJSON(readLines(json_file))
 }
 
@@ -46,7 +46,7 @@ knitron.execute_code <- function(code, kernel = NULL) {
   args <- paste(.knitron_env$knitron_wrapper, kernel,
                 if (is.null(kernel)) .knitron_env$gkernel else kernel,
                 "code", code)
-  system2("python", args, wait = TRUE)
+  system2("ipython", args, wait = TRUE)
 }
 
 .knitron_defaults <- function(options) {
