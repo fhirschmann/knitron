@@ -4,6 +4,11 @@ Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/
 
 Currently a work in progress; it is already usable.
 
+NOTE: I wrote this for an older version of IPython where the `IPython.kernel` module was
+still present. The API seems to have changed and I'll write a version for the new IPython
+API when I have time to do so.
+
+
 ## Installation
 
 ```r
@@ -71,7 +76,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 1 ms, sys: 0 ns, total: 1 ms
+## CPU times: user 0 ns, sys: 2 ms, total: 2 ms
 ## Wall time: 501 ms
 ```
 
