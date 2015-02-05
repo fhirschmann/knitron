@@ -2,11 +2,23 @@
 
 Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/knitr/).
 
+It also brings workspace-like interaction for Python to knitr, so you can define
+a variable in one chunk
+
+```{r, engine = 'ipython'}
+x = 5
+```
+
+and access it in a following chunck
+
+```{r, engine = 'ipython'}
+5 + 1
+```
 
 ## Requirements
 
 - R and knitr
-- A recent version of IPython (this relies on the new `IPython.parallel` API)
+- A recent version of IPython (knitron relies on the new `IPython.parallel` API)
 
 ## Installation
 
@@ -25,18 +37,11 @@ That's it! Now you can use IPython in knitr using the `engine = 'ipython'` optio
 (see the [source code](https://raw.githubusercontent.com/fhirschmann/knitron/master/README.Rmd)
 of this page for an example).
 
-Knitron brings workspace-like interaction for Python to knitr, so you can define
-a variable in one chunk
+By default, the `knitr` IPython profile will be used. You can change this using the `knitron.profile` chunk option. If the profile doesn't exist already, it will be created and can then be modified (take a look at `~/.ipython/profile_knitr`). When the first chunk for each profile gets evaluated, a cluster with one engine will be spawned by knitron if it isn't already running. You can also spawn your cluster in a parallel process using
 
-```{r, engine = 'ipython'}
-x = 5
-```
+    ipcluster start --profile=knitr --n=1
 
-and access it in a following chunck
-
-```{r, engine = 'ipython'}
-5 + 1
-```
+If the cluster has been spawned by knitron, it will be terminated on exit.
 
 ### Supported Features and Limitations
 
