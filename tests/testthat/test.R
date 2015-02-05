@@ -29,6 +29,14 @@ run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, profile = 
     list(out = out, files = files)
 }
 
+test_that("engine starts and stops", {
+  expect_false(knitron.is_running("knitr_test_ss"))
+  knitron.start(profile="knitr_test_ss")
+  expect_true(knitron.is_running("knitr_test_ss"))
+  knitron.stop(profile="knitr_test_ss")
+  expect_false(knitron.is_running("knitr_test_ss"))
+})
+
 test_that("[markdown] Matplotlib is not loaded", {
   expect_equal(run_knit("import sys; 'matplotlib' in sys.modules", knitron.matplotlib = FALSE)$out, "False")
 })
