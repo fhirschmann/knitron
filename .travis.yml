@@ -4,8 +4,9 @@ before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
-  - sudo apt-get install -qq ipython python python-pip texlive-latex-extra
+  - sudo apt-get install -qq python python-pip texlive-latex-extra
   - sudo pip install pyzmq
+  - sudo pip install ipython
 install:
   - ./travis-tool.sh install_deps
 script: ./travis-tool.sh run_tests
