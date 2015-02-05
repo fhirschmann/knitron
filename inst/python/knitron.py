@@ -44,7 +44,7 @@ class Knitron(object):
 
     def execute(self, *lines, **kwargs):
         """
-        Execute code initialized kernel.
+        Execute code remotely.
 
         :param lines: lines to execute
         :type lines: strings
@@ -79,10 +79,34 @@ class Knitron(object):
 
     @remote
     def clear_figures():
+        """
+        Delete all figures in the pylab state machine.
+        """
         for fignum in plt.get_fignums():
             plt.close(fignum)
 
+    @remote
+    def chdir(path):
+        """
+        Changes the working directory remotely and returns
+        the previous working directory.
+
+        :param path: path to change the working dir to
+        :returns: path of the previous workign directory
+        """
+        import os
+
+        cwd = os.getcwd()
+        os.chdir(path)
+        return cwd
+
     def ensure_matplotlib(self, backend):
+        """
+        Ensures that matplotlib is loaded remotely.
+
+        :param backend: the packend to use
+        :returns: True if matplotlib was loaded
+        """
         # Strangely this doesn't work in _ensure_matplotlib
         self.execute("import matplotlib.pyplot as plt")
 
@@ -135,9 +159,7 @@ if __name__ == "__main__":
         options = loads(sys.stdin.read())
 
         if options.get("knitron.base.dir", None):
-            kw.execute("import os", "os.chdir('{0}')".format(
-                options["knitron.base.dir"]))
-            curdir = kw.execute("import os", "os.getcwd()")[2][0][1:-1]
+            curdir = kw.chdir(options["knitron.base.dir"])
         else:
             curdir = None
 
@@ -149,6 +171,7 @@ if __name__ == "__main__":
 
         stdout, stderr, text = kw.execute(*options["code"])
 
+        # Save all figures in the current chunk to files
         figures = []
         if options["knitron.matplotlib"] and options["knitron.autoplot"]:
             for fignum in kw.figures:
@@ -167,14 +190,7 @@ if __name__ == "__main__":
             json_out.write("\n")
 
         if curdir:
-            kw.execute("os.chdir('{0}')".format(curdir))
-    elif sys.argv[2] == "test":
-        print(kw.ensure_matplotlib("png"))
-        print(kw.figures)
-        kw.execute("plt.plot([1, 2, 3])")
-        print(kw.figures)
-
-
+            kw.chdir(curdir)
     else:
         code = sys.argv[3]
         if type(code) in [str, unicode]:
