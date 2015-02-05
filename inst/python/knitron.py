@@ -64,7 +64,7 @@ class Knitron(object):
         except (KeyError, TypeError):
             pyout = ""
 
-        return md["stdout"], md["stderr"], os.linesep.join(pyout)
+        return md["stdout"], md["stderr"], pyout
 
     @property
     def figures(self):
