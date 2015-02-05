@@ -1,4 +1,4 @@
-#' Starts an IPython cluster with one engine.
+#' Starts an IPython cluster with one engine
 #' 
 #' @param profile the name of the profile
 #' @param wait wait for the engine to start up
@@ -25,8 +25,10 @@ knitron.start <- function(profile = "knitr", wait = TRUE, quiet = TRUE) {
   }
 }
 
-#' Stops an IPython cluster.
+#' Stops an IPython cluster
 #' 
+#' @param profile the name of the profile
+#' @param quiet be quiet about IPython's shutdown messages
 #' @export
 knitron.stop <- function(profile = "knitr", quiet = TRUE) {
   system2("ipcluster", c("stop", paste("--profile", profile, sep="=")),
@@ -34,18 +36,19 @@ knitron.stop <- function(profile = "knitr", quiet = TRUE) {
   .knitron_env$profiles <- setdiff(.knitron_env$profiles, profile)
 }
 
-#' Returns true if the cluster is running.
+#' Returns true if the cluster is running
 #' 
+#' @param profile the name of the profile
 #' @return \code{TRUE} if cluster is running
 #' @export
 knitron.is_running <- function(profile = "knitr") {
   paste(knitron.execute_code("0", profile), collapse="") == "0"
 }
 
-#' Execute a code chunk from a knitr option list.
+#' Execute a code chunk from a knitr option list
 #' 
 #' @param options a knitr option list
-#' @param kernel the kernel ID to use
+#' @param profile the name of the profile
 #' @return a data frame of messages from the Python wrapper
 #' @export
 knitron.execute_chunk <- function(options, profile = "knitr") {
@@ -55,10 +58,11 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
   jsonlite::fromJSON(readLines(json_file))
 }
 
-#' Execute a single Python command.
+#' Execute a single Python command
 #' 
 #' @param code the command to execute
-#' @param kernel the kernel ID to use
+#' @param profile the name of the profile
+#' @return the command's stdout and stderr
 #' @export
 knitron.execute_code <- function(code, profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "code", code)
@@ -81,7 +85,7 @@ knitron.execute_code <- function(code, profile = "knitr") {
   else !grepl("matplotlib", text)
 }
 
-#' An IPython engine that can be registered with knitr.
+#' An IPython engine that can be registered with knitr
 #' 
 #' @param options an knitr option list
 #' @return output for knitr
