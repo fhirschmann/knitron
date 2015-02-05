@@ -4,9 +4,6 @@ from functools import partial
 from json import dump, loads
 import os
 import sys
-from time import sleep
-from pprint import pprint
-from Queue import Empty
 
 from IPython.parallel import Client
 from IPython.parallel.client.remotefunction import RemoteFunction
