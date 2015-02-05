@@ -1,10 +1,10 @@
-run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, ...) {
+run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, profile = "knitr", ...) {
   tmp <- tempfile(pattern = "knitron.test.")
   dir.create(tmp)
   opts_knit$set(base.dir = tmp)
   on.exit(unlink(tmp, recursive = TRUE))
 
-  options <- c(..., echo = echo)
+  options <- c(..., echo = echo, knitron.profile = profile)
   args <- if (length(options) == 0)
     ""
   else
@@ -80,4 +80,11 @@ test_that("[latex] Two plots are created", {
                   latex = TRUE)
   expect_match(res$out, "includegraphics.*figure/unnamed-chunk-1-1.*includegraphics.*figure/unnamed-chunk-1-2")
   expect_equal(res$files, c("figure/unnamed-chunk-1-1.pdf", "figure/unnamed-chunk-1-2.pdf"))
+})
+
+test_that("profiles are distinct", {
+  run_knit("x = 1", profile="knitr_test_1")
+  run_knit("x = 2", profile="knitr_test_2")
+  expect_equal(run_knit("x", profile="knitr_test_1")$out, "1")
+  expect_equal(run_knit("x", profile="knitr_test_2")$out, "2")
 })
