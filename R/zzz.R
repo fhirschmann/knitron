@@ -1,6 +1,3 @@
-.knitron_env <- new.env(parent = emptyenv())
-.knitron_env$profiles <- c()
-
 .knitr.finalizer <- function(obj) {
   sapply(obj$.knitron_env$profiles, obj$knitron.stop)
 }

@@ -1,6 +1,8 @@
 #' Starts an IPython cluster with one engine.
 #' 
 #' @param profile the name of the profile
+#' @param wait wait for the engine to start up
+#' @param quiet be quiet about IPython's startup messages
 #' @export
 knitron.start <- function(profile = "knitr", wait = TRUE, quiet = TRUE) {
   message(paste("Starting cluster for profile", profile))
