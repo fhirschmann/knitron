@@ -3,7 +3,7 @@
 export(eng_ipython)
 export(knitron.execute_chunk)
 export(knitron.execute_code)
-export(knitron.register)
+export(knitron.is_running)
 export(knitron.start)
 export(knitron.stop)
 import(knitr)
