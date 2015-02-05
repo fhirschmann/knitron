@@ -95,7 +95,7 @@ for s in shift:
     plt.plot(x, np.sin(x + s), 'o-')
 ```
 
-## Sympy
+### Sympy
 
 ```{r, engine = 'ipython'}
 import sympy as sm
