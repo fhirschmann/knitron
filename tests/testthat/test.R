@@ -20,7 +20,7 @@ run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, ...) {
     paste("```{r, engine = 'ipython'", args, "}\n", code, "\n```", sep="")
 
   # Set quiet to FALSE when something goes wrong
-  out <- knit(text=text, quiet = FALSE)
+  out <- knit(text=text, quiet = TRUE)
   files <- list.files(tmp, recursive = TRUE)
 
   if (strip)
