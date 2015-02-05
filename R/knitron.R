@@ -1,13 +1,14 @@
-#' Starts a new IPython kernel into the background and returns its PID
+#' Starts an IPython cluster with one engine.
 #' 
 #' @param profile the name of the profile
-#' @return the profile name
 #' @export
-knitron.start <- function(profile = "knitr", wait = TRUE) {
+knitron.start <- function(profile = "knitr", wait = TRUE, quiet = TRUE) {
+  message(paste("Starting cluster for profile", profile))
+
   system2("ipcluster", c("start", paste("--profile", profile, sep="="), "--n=1"),
-          wait = FALSE)
+          wait = FALSE, stderr = if(quiet) FALSE else "")
   
-  # Keep a list so that we can kill the kernels later
+  # Keep a list so that we can kill the clusters later
   .knitron_env$profiles <- append(.knitron_env$profiles, profile)
 
   if (wait) {
@@ -20,23 +21,26 @@ knitron.start <- function(profile = "knitr", wait = TRUE) {
         stop("IPython cluster could not be started. Giving up.")
     }
   }
-  profile
 }
 
-#' Stop
+#' Stops an IPython cluster.
+#' 
 #' @export
-knitron.stop <- function(profile = "knitr") {
-  system2("ipcluster", c("stop", paste("--profile", profile, sep="=")))
+knitron.stop <- function(profile = "knitr", quiet = TRUE) {
+  system2("ipcluster", c("stop", paste("--profile", profile, sep="=")),
+          stderr = if(quiet) FALSE else "")
   .knitron_env$profiles <- setdiff(.knitron_env$profiles, profile)
 }
 
-#' Returns true if the cluster is running
+#' Returns true if the cluster is running.
+#' 
+#' @return \code{TRUE} if cluster is running
 #' @export
 knitron.is_running <- function(profile = "knitr") {
-  paste(knitron.execute_code("0"), collapse="") == "0"
+  paste(knitron.execute_code("0", profile), collapse="") == "0"
 }
 
-#' Execute a code chunk from a knitr option list
+#' Execute a code chunk from a knitr option list.
 #' 
 #' @param options a knitr option list
 #' @param kernel the kernel ID to use
@@ -49,7 +53,8 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
   jsonlite::fromJSON(readLines(json_file))
 }
 
-#' Execute a single Python command
+#' Execute a single Python command.
+#' 
 #' @param code the command to execute
 #' @param kernel the kernel ID to use
 #' @export
@@ -58,18 +63,12 @@ knitron.execute_code <- function(code, profile = "knitr") {
   system2("ipython", args, wait = TRUE, stdout = TRUE, stderr = TRUE)
 }
 
-#' Register the IPython engine with knitr
-#' @import knitr
-#' @export
-knitron.register <- function(profile = "knitr") {
-  knitr::knit_engines$set(ipython = function(options) eng_ipython(options, profile))
-}
-
 .knitron_defaults <- function(options) {
   defaults <- list(
     knitron.autoplot = TRUE,
     knitron.matplotlib = TRUE,
-    knitron.print = "auto"
+    knitron.print = "auto",
+    knitron.profile = "knitr"
   )
   append(defaults[!names(defaults) %in% names(options)], options)
 }
@@ -80,18 +79,25 @@ knitron.register <- function(profile = "knitr") {
   else !grepl("matplotlib", text)
 }
 
-#' An IPython engine that gets registered with knitr
+#' An IPython engine that can be registered with knitr.
 #' 
 #' @param options an knitr option list
 #' @return output for knitr
 #' @export
 #' @import knitr
-eng_ipython = function(options, profile = "knitr") {
+eng_ipython = function(options) {
   koptions <- .knitron_defaults(options)
   koptions$knitron.fig.path <- fig_path("", options, NULL)
   koptions$knitron.base.dir <- knitr::opts_knit$get("base.dir")
+
+  profile <- koptions$knitron.profile
+
+  # Start the cluster automatically
+  if (!profile %in% .knitron_env$profiles)
+    if (!knitron.is_running(profile))
+      knitron.start(profile)
   
-  # We set the engine to python for further processing (highlighting),
+  # We set the engine to python for further processing (highlighting)
   options$engine <- "python"
 
   if (paste(options$code, sep = "", collapse = "") == "")
