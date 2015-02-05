@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from functools import partial
 from json import dump, loads
 import os
 import sys
@@ -7,10 +8,21 @@ from time import sleep
 from pprint import pprint
 from Queue import Empty
 
-from IPython.kernel import BlockingKernelClient
-from IPython.lib.kernel import find_connection_file
+from IPython.parallel import Client
+from IPython.parallel.client.remotefunction import RemoteFunction
 
 DEBUG = bool(os.environ.get("DEBUG", False))
+
+
+class remote(object):
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, instance, owner):
+        def wrap(*args, **kwargs):
+            return RemoteFunction(instance.view, self.f,
+                                  block=True)(*args, **kwargs)[0]
+        return wrap
 
 
 class Knitron(object):
@@ -22,15 +34,13 @@ class Knitron(object):
         "png": "AGG",
     }
 
-    def __init__(self, kernel):
+    def __init__(self, profile):
         """
         :param kernel: the kernel id (process id)
         :type kernel: integer
         """
-        cf = find_connection_file(kernel)
-        self.client = BlockingKernelClient(connection_file=cf)
-        self.client.load_connection_file()
-        self.client.start_channels()
+        self.client = Client(profile=profile)
+        self.view = self.client[:]
 
     def execute(self, *lines, **kwargs):
         """
@@ -44,66 +54,52 @@ class Knitron(object):
                   of msg_type == 'pyout'
         """
         code = "\n".join(lines)
-        wait_for = self.client.execute(code)
+        md = self.view.execute(code, block=True, silent=False).metadata[0]
 
-        stdout = []
-        text = []
-        stderr = []
+        if kwargs.get("print_errors", True) and md["stderr"]:
+            print(os.linesep.join(md["stderr"]))
 
-        while True:
-            try:
-                msg = self.client.get_iopub_msg(timeout=0.5)
+        try:
+            pyout = md["pyout"]["data"]["text/plain"]
+        except (KeyError, TypeError):
+            pyout = ""
 
-                if DEBUG:
-                    pprint(msg)
-
-                if msg["parent_header"]["msg_id"] == wait_for:
-                    if msg["content"].get("execution_state", None) == "idle":
-                        break
-
-                if msg["msg_type"] == "pyout":
-                    if msg["content"]["data"].get("text/plain"):
-                        text.append(msg["content"]["data"]["text/plain"])
-                elif msg["msg_type"] == "pyerr":
-                    stderr.extend(msg["content"]["traceback"])
-                elif "data" in msg["content"]:
-                    stdout.append(msg["content"]["data"])
-
-            except Empty:
-                sleep(0.1)
-
-        if kwargs.get("print_errors", True) and stderr:
-            print(os.linesep.join(stderr))
-
-        return stdout, stderr, text
-
-    def load_matplotlib(self, backend):
-        """
-        Loads matplotlib into the kernel.
-
-        :param backend: backend to use (e.g. AGG)
-        :type backend: str
-        """
-        _, stderr, _ = self.execute(
-            "import matplotlib",
-            "matplotlib.interactive(False)",
-            "matplotlib.use('{0}')".format(self.DEV_MAP.get(backend, backend)),
-            "import matplotlib.pyplot as plt",
-            "for fignum in plt.get_fignums():",
-            "   plt.close(fignum)")
+        return md["stdout"], md["stderr"], os.linesep.join(pyout)
 
     @property
     def figures(self):
         """
         List of figures in the pylab state machine.
         """
-        res = self.execute("','.join(map(str, plt.get_fignums()))")
-        try:
-            return map(int, res[2][0][1:-1].split(","))
-        except ValueError:
-            return []
+        return self._figures()
 
-    def save_figure(self, fignum, filename, dpi, width, height):
+    @remote
+    def _figures():
+        return plt.get_fignums()
+
+    @remote
+    def clear_figures():
+        for fignum in plt.get_fignums():
+            plt.close(fignum)
+
+    def ensure_matplotlib(self, backend):
+        # Strangely this doesn't work in _ensure_matplotlib
+        self.execute("import matplotlib.pyplot as plt")
+
+        return self._ensure_matplotlib(self.DEV_MAP.get(backend, backend))
+
+    @remote
+    def _ensure_matplotlib(backend):
+        import sys
+
+        if not "matplotlib" in sys.modules:
+            import matplotlib
+
+            matplotlib.interactive(False)
+            matplotlib.use(backend)
+
+    @remote
+    def save_figure(fignum, filename, dpi, width, height):
         """
         Save a figure to a file.
 
@@ -118,21 +114,21 @@ class Knitron(object):
         :param height: height in inches
         :type height int
         """
-        dirname = os.path.dirname(filename)
+        import os
 
-        self.execute(
-            "import os",
-            "if not os.path.exists('{0}'):".format(dirname),
-            "   os.makedirs('{0}')".format(dirname),
-            "plt.figure({0})".format(fignum),
-            "plt.gcf().set_size_inches({0}, {1})".format(width, height),
-            "plt.gcf().savefig('{0}', dpi={1})".format(filename, dpi))
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
+        plt.figure(fignum)
+        plt.gcf().set_size_inches(width, height)
+        plt.gcf().savefig(filename, dpi=dpi)
 
 
 if __name__ == "__main__":
     # Usage:
-    #   knitron.py KERNEL_ID chunk JSON_OUTPUT << JSON_INPUT
-    #   knitron.py KERNEL_ID code COMMAND
+    #   knitron.py PROFILE chunk JSON_OUTPUT << JSON_INPUT
+    #   knitron.py PROFILE code COMMAND
     kw = Knitron(sys.argv[1])
 
     if sys.argv[2] == "chunk":
@@ -146,7 +142,7 @@ if __name__ == "__main__":
             curdir = None
 
         if options["knitron.matplotlib"]:
-            kw.load_matplotlib(options["dev"])
+            kw.ensure_matplotlib(options["dev"])
 
         if type(options["code"]) in [str, unicode]:
             options["code"] = [options["code"]]
@@ -162,6 +158,7 @@ if __name__ == "__main__":
                 kw.save_figure(fignum, filename, options["dpi"],
                                options["fig.width"], options["fig.height"])
                 figures.append(filename)
+            kw.clear_figures()
 
         with open(sys.argv[3], "w") as json_out:
             dump({"stdout": stdout, "stderr": stderr,
@@ -171,10 +168,16 @@ if __name__ == "__main__":
 
         if curdir:
             kw.execute("os.chdir('{0}')".format(curdir))
+    elif sys.argv[2] == "test":
+        print(kw.ensure_matplotlib("png"))
+        print(kw.figures)
+        kw.execute("plt.plot([1, 2, 3])")
+        print(kw.figures)
+
 
     else:
         code = sys.argv[3]
         if type(code) in [str, unicode]:
             code = [code]
-        output = kw.execute_code(*code)
-        print("".join("\n".join(output)))
+        output = kw.execute(*code)
+        print("".join(output), end="")
