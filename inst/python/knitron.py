@@ -105,17 +105,10 @@ class Knitron(object):
         :returns: True if matplotlib was loaded
         """
         # Strangely this doesn't work in _ensure_matplotlib
+        self.execute("import matplotlib")
+        self.execute("matplotlib.use('{0}')".format(self.DEV_MAP.get(backend, backend)))
         self.execute("import matplotlib.pyplot as plt")
         self.execute("plt.ioff()")
-
-        self._ensure_matplotlib(self.DEV_MAP.get(backend, backend))
-
-    @remote
-    def _ensure_matplotlib(backend):
-        import matplotlib
-
-        matplotlib.interactive(False)
-        matplotlib.use(backend)
 
     @remote
     def save_figure(fignum, filename, dpi, width, height):
