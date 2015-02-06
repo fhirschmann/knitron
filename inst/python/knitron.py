@@ -102,23 +102,19 @@ class Knitron(object):
         Ensures that matplotlib is loaded remotely.
 
         :param backend: the packend to use
-        :returns: True if matplotlib was loaded
         """
-        # Strangely this doesn't work in _ensure_matplotlib
-        self.execute("import matplotlib.pyplot as plt")
-        self.execute("plt.ioff()")
 
-        return self._ensure_matplotlib(self.DEV_MAP.get(backend, backend))
+        self._ensure_matplotlib(self.DEV_MAP.get(backend, backend))
 
     @remote
     def _ensure_matplotlib(backend):
-        import sys
+        import matplotlib
 
-        if not "matplotlib" in sys.modules:
-            import matplotlib
+        matplotlib.interactive(False)
+        matplotlib.use(backend)
 
-            matplotlib.interactive(False)
-            matplotlib.use(backend)
+        import matplotlib.pyplot as plt
+        plt.ioff()
 
     @remote
     def save_figure(fignum, filename, dpi, width, height):

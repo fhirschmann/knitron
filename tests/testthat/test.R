@@ -37,12 +37,12 @@ test_that("engine starts and stops", {
   expect_false(knitron.is_running("knitr_test_ss"))
 })
 
-test_that("[markdown] Matplotlib is not loaded", {
-  expect_equal(run_knit("import sys; 'matplotlib' in sys.modules", knitron.matplotlib = FALSE)$out, "False")
-})
-
 test_that("[markdown] Matplotlib is loaded", {
   expect_equal(run_knit("import sys; 'matplotlib' in sys.modules")$out, "True")
+})
+
+test_that("[markdown] Pyplot is loaded", {
+  expect_equal(run_knit("import sys; 'matplotlib.pyplot' in sys.modules")$out, "True")
 })
 
 test_that("[markdown] Waiting for code exeuction", {
