@@ -106,6 +106,7 @@ class Knitron(object):
         """
         # Strangely this doesn't work in _ensure_matplotlib
         self.execute("import matplotlib.pyplot as plt")
+        self.execute("plt.ioff()")
 
         return self._ensure_matplotlib(self.DEV_MAP.get(backend, backend))
 
