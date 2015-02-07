@@ -37,6 +37,11 @@ library(devtools)
 install_github("knitron", "fhirschmann")
 ```
 
+## Design
+
+In order to provide a persistent state for multiple chunks in a document,
+knitron makes use of IPython's [architecture for parallel computing](http://ipython.org/ipython-doc/2/parallel/parallel_intro.html). An IPython cluster is started into the background before the chunks are being processed.
+
 ## Usage
 
 ```r
@@ -85,7 +90,7 @@ knitr.
 
 ## Examples
 
-## IPython
+### IPython
 
 
 ```python
