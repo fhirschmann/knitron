@@ -22,6 +22,7 @@ and access it in a following chunck
 
 - R and knitr
 - A recent version of IPython (knitron relies on the new `IPython.parallel` API)
+- pyzmq
 
 ## Installation
 
@@ -45,6 +46,17 @@ By default, the `knitr` IPython profile will be used. You can change this using 
     ipcluster start --profile=knitr --n=1
 
 If the cluster has been spawned by knitron, it will be terminated on exit.
+
+### Chunk Options
+
+The following knitron-specific chunk options are available in knitron:
+
+- `knitron.profile = "knitr"` specifies the IPython profile to be used for the evaluation
+  of the chunk.
+- `knitron.matplotlib = TRUE` loads matplotlib and pyplot (as `plt`) before executing a chunk.
+- `knitron.print = "auto"` will print the string representation of the last object in a code
+  chunk. By default, it will not print the string representation of a plot. Other values
+  for this option are `TRUE` and `FALSE`.
 
 ### Supported Features and Limitations
 
