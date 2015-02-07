@@ -17,7 +17,7 @@ and access it in a following chunck
 
 
 ```python
-5 + 1
+x + 1
 ```
 
 ```
@@ -101,7 +101,7 @@ from time import sleep
 
 ```
 ## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
-## Wall time: 501 ms
+## Wall time: 500 ms
 ```
 
 

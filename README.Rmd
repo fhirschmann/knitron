@@ -12,10 +12,10 @@ a variable in one chunk
 x = 5
 ```
 
-and access it in a following chunck
+and access it in a following chunk
 
 ```{r, engine = 'ipython'}
-5 + 1
+x + 1
 ```
 
 ## Requirements
