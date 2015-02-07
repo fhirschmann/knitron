@@ -1,5 +1,8 @@
 # knitron: knitr + IPython + matplotlib
 
+[![Build Status](https://travis-ci.org/fhirschmann/knitron.png?branch=master)](https://travis-ci.org/fhirschmann/knitron)
+
+
 Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/knitr/).
 
 It also brings workspace-like interaction for Python to knitr, so you can define
@@ -90,11 +93,12 @@ from time import sleep
 ```
 
 ```
-## Variable   Type                          Data/Info
-## --------------------------------------------------
-## plt        module                        <module 'matplotlib.pyplo<...>7/matplotlib/pyplot.pyc'>
-## sleep      builtin_function_or_method    <built-in function sleep>
-## x          int                           5
+## Variable     Type                          Data/Info
+## ----------------------------------------------------
+## matplotlib   module                        <module 'matplotlib' from<...>matplotlib/__init__.pyc'>
+## plt          module                        <module 'matplotlib.pyplo<...>7/matplotlib/pyplot.pyc'>
+## sleep        builtin_function_or_method    <built-in function sleep>
+## x            int                           5
 ```
 
 ### Matplotlib

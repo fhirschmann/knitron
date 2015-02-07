@@ -1,5 +1,8 @@
 # knitron: knitr + IPython + matplotlib
 
+[![Build Status](https://travis-ci.org/fhirschmann/knitron.png?branch=master)](https://travis-ci.org/fhirschmann/knitron)
+
+
 Knitron brings the power of IPython and matplotlib to [knitr](http://yihui.name/knitr/).
 
 It also brings workspace-like interaction for Python to knitr, so you can define
