@@ -1,4 +1,5 @@
 ^.*\.Rproj$
+^.*\.RData$
 ^.*\.pyc$
 ^\.Rproj\.user$
 ^README\.Rmd$
