@@ -54,7 +54,9 @@ knitron.is_running <- function(profile = "knitr") {
 knitron.execute_chunk <- function(options, profile = "knitr") {
   json_file <- tempfile()
   args <- paste(.knitron_env$knitron_wrapper, profile, "chunk", json_file)
-  system2("ipython", args, input = jsonlite::toJSON(options, auto_unbox = TRUE))
+  out <- system2("ipython", args, input = jsonlite::toJSON(options, auto_unbox = TRUE),
+                 wait = TRUE, stdout = TRUE, stderr = TRUE)
+  cat(paste(out, collapse = "\n"))
   jsonlite::fromJSON(readLines(json_file))
 }
 
