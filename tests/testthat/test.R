@@ -1,4 +1,4 @@
-run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, profile = "knitr", ...) {
+run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, ft = FALSE, profile = "knitr", ...) {
   tmp <- tempfile(pattern = "knitron.test.")
   dir.create(tmp)
   opts_knit$set(base.dir = tmp)
@@ -20,13 +20,18 @@ run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, profile = 
     paste("```{r, engine = 'ipython'", args, "}\n", code, "\n```", sep="")
 
   # Set quiet to FALSE when something goes wrong
-  out <- knit(text=text, quiet = FALSE)
+  out <- knit(text = text, quiet = TRUE)
   files <- list.files(tmp, recursive = TRUE)
 
+  res <- list(out = out, files = files)
   if (strip)
-    list(out = gsub("\n```", "", gsub("\n```\n## ", "", out)), files = files)
-  else
-    list(out = out, files = files)
+    res$out <- gsub("\n```", "", gsub("\n```\n## ", "", out))
+  
+  if (ft)
+    res$file_types <- sapply(file.path(tmp, files), function(f) system2("file", c("-b", f), stdout = TRUE),
+                             USE.NAMES = FALSE)
+
+  res
 }
 
 test_that("engine starts and stops", {
@@ -95,4 +100,25 @@ test_that("profiles are distinct", {
   run_knit("x = 2", profile="knitr_test_2")
   expect_equal(run_knit("x", profile="knitr_test_1")$out, "1")
   expect_equal(run_knit("x", profile="knitr_test_2")$out, "2")
+})
+
+test_that("[cairo png] image is created", {
+  res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE)
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png) ")
+  expect_equal(res$files, "figure/unnamed-chunk-1-1.png")
+  expect_match(res$file_types, ".*PNG image.*")
+})
+
+test_that("[cairo jpeg] image is created", {
+  res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE, dev = "CairoJPEG")
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.jpeg) ")
+  expect_equal(res$files, "figure/unnamed-chunk-1-1.jpeg")
+  expect_match(res$file_types, ".*JPEG image.*")
+})
+
+test_that("[svg] image is created", {
+  res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE, dev = "svg")
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.svg) ")
+  expect_equal(res$files, "figure/unnamed-chunk-1-1.svg")
+  expect_match(res$file_types, ".*SVG Scalable Vector.*")
 })

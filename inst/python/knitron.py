@@ -27,10 +27,6 @@ class Knitron(object):
     Two-way communication with an existing IPython kernel to be used
     in the dynamic report generation framework knitr.
     """
-    DEV_MAP = {
-        "png": "AGG",
-    }
-
     def __init__(self, profile):
         """
         :param kernel: the kernel id (process id)
@@ -104,11 +100,10 @@ class Knitron(object):
         :param backend: the packend to use
         :returns: True if matplotlib was loaded
         """
-        # Strangely this doesn't work in _ensure_matplotlib
-        self.execute("import matplotlib")
-        self.execute("matplotlib.use('{0}')".format(self.DEV_MAP.get(backend, backend)))
-        self.execute("import matplotlib.pyplot as plt")
-        self.execute("plt.ioff()")
+        return self.execute("import matplotlib",
+                            "import matplotlib.pyplot as plt",
+                            "plt.ioff()",
+                            "plt.switch_backend('{0}')".format(backend))
 
     @remote
     def save_figure(fignum, filename, dpi, width, height):
@@ -152,7 +147,7 @@ if __name__ == "__main__":
             curdir = None
 
         if options["knitron.matplotlib"]:
-            kw.ensure_matplotlib(options["dev"])
+            kw.ensure_matplotlib(options["knitron.backend"])
 
         if type(options["code"]) in [str, unicode]:
             options["code"] = [options["code"]]
@@ -164,7 +159,7 @@ if __name__ == "__main__":
         if options["knitron.matplotlib"] and options["knitron.autoplot"]:
             for fignum in kw.figures:
                 filename = (options["knitron.fig.path"] + "-" + str(fignum) +
-                            "." + options["dev"])
+                            "." + options["fig.ext"])
                 figure = options["knitron.fig.path"]
                 kw.save_figure(fignum, filename, options["dpi"],
                                options["fig.width"], options["fig.height"])
