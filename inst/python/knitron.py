@@ -104,6 +104,7 @@ class Knitron(object):
         :returns: True if matplotlib was loaded
         """
         return self.execute("import matplotlib",
+                            "matplotlib.use('{0}', warn=False, force=True)".format(backend),
                             "import matplotlib.pyplot as plt",
                             "plt.ioff()",
                             "plt.switch_backend('{0}')".format(backend))
