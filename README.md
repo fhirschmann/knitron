@@ -58,6 +58,11 @@ By default, the `knitr` IPython profile will be used. You can change this using 
 
 If the cluster has been spawned by knitron, it will be terminated on exit.
 
+### Matplotlib
+
+Knitron imports matplotlib an pyplot (as `plt`) unless `knitron.matplotlib` is set
+to `FALSE`. For figures to appear after the chunk, pyplot is expected to be used.
+
 ### Chunk Options
 
 The following knitron-specific chunk options are available in knitron:
@@ -103,7 +108,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
+## CPU times: user 1 ms, sys: 0 ns, total: 1 ms
 ## Wall time: 501 ms
 ```
 
