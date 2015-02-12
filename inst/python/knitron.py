@@ -10,6 +10,9 @@ from IPython.parallel.client.remotefunction import RemoteFunction
 
 DEBUG = bool(os.environ.get("DEBUG", False))
 
+if sys.version_info[0] >= 3:
+    unicode = str
+
 
 class remote(object):
     def __init__(self, f):
