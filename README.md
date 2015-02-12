@@ -13,7 +13,7 @@ a variable in one chunk
 x = 5
 ```
 
-and access it in a following chunck
+and access it in a following chunk
 
 
 ```python
@@ -76,11 +76,14 @@ Most of the original knitr chunk options are supported, including
 - `fig.path`
 - `fig.width` and `fig.height`
 - `dpi`
-- `dev` ('pdf' for LaTeX and 'png' for HTML/markdown)
+- `dev` 'pdf' for LaTeX and 'png' for HTML/markdown;
+  most of the other devices (e.g. svg, Cairo_png) are supported too
 
 However, there are limitations to some options:
 
 - fig.show only supports 'hold', i.e. all figures are placed at the end of the code chunk
+- `dev` currently supports only one device per chunk, i.e. you cannot give a character vector
+  so that two plots with different devices are generated
 
 IPython's magic functions are supported too, of course. But there are
 some limitations, i.e. magic functions that insert text into the IPython
@@ -101,7 +104,7 @@ from time import sleep
 
 ```
 ## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
-## Wall time: 500 ms
+## Wall time: 501 ms
 ```
 
 
