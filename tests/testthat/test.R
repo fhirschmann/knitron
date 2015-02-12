@@ -110,6 +110,7 @@ test_that("[cairo png] image is created", {
 })
 
 test_that("[cairo jpeg] image is created", {
+  skip("Not available on travis")
   res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE, dev = "CairoJPEG")
   expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.jpeg) ")
   expect_equal(res$files, "figure/unnamed-chunk-1-1.jpeg")
