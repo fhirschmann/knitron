@@ -60,7 +60,7 @@ If the cluster has been spawned by knitron, it will be terminated on exit.
 
 ### Matplotlib
 
-Knitron imports matplotlib an pyplot (as `plt`) unless `knitron.matplotlib` is set
+Knitron imports matplotlib and pyplot (as `plt`) unless `knitron.matplotlib` is set
 to `FALSE`. For figures to appear after the chunk, pyplot is expected to be used.
 
 ### Chunk Options
@@ -93,7 +93,7 @@ However, there are limitations to some options:
 IPython's magic functions are supported too, of course. But there are
 some limitations, i.e. magic functions that insert text into the IPython
 shell like `%load` without executing them don't work. Likewise, magics
-that are meant for interaction use like `%man` and `%edit` cannot work in
+that are meant for interactive use like `%man` and `%edit` cannot work in
 knitr.
 
 ## Examples
@@ -108,7 +108,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 1 ms, sys: 0 ns, total: 1 ms
+## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
 ## Wall time: 501 ms
 ```
 
