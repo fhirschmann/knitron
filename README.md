@@ -30,6 +30,14 @@ x + 1
 - A recent version of IPython (knitron relies on the new `IPython.parallel` API)
 - pyzmq
 
+These can be installed by executing:
+
+```bash
+Rscript -e "install.packages('knitr')"
+pip install IPython
+pip install pyzmq
+```
+
 ## Installation
 
 ```r
@@ -108,7 +116,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
+## CPU times: user 0 ns, sys: 1 ms, total: 1 ms
 ## Wall time: 501 ms
 ```
 

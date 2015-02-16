@@ -24,6 +24,14 @@ x + 1
 - A recent version of IPython (knitron relies on the new `IPython.parallel` API)
 - pyzmq
 
+These can be installed by executing:
+
+```bash
+Rscript -e "install.packages('knitr')"
+pip install IPython
+pip install pyzmq
+```
+
 ## Installation
 
 ```r
