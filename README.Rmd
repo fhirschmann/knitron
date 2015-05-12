@@ -20,19 +20,23 @@ x + 1
 
 ## Requirements
 
-- R and knitr
+- R with knitr and devtools
 - A recent version of IPython (knitron relies on the new `IPython.parallel` API)
 - pyzmq
 
-These can be installed by executing:
+These can be installed by executing (in a shell):
 
 ```bash
 Rscript -e "install.packages('knitr')"
+apt-get install python-dev libzmq3-dev libgit2-dev # on Debian and derivates
+Rscript -e "install.packages('devtools')"
 pip install IPython
 pip install pyzmq
 ```
 
 ## Installation
+
+In R:
 
 ```r
 library(devtools)
