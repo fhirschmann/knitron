@@ -19,7 +19,7 @@ knitron.start <- function(profile = "knitr", wait = TRUE, quiet = TRUE) {
     while (!knitron.is_running(profile)) {
       Sys.sleep(0.5)
       count <- count + 1
-      if (count > 20)
+      if (count > 40)
         stop("IPython cluster could not be started. Giving up.")
     }
   }
@@ -42,7 +42,8 @@ knitron.stop <- function(profile = "knitr", quiet = TRUE) {
 #' @return \code{TRUE} if cluster is running
 #' @export
 knitron.is_running <- function(profile = "knitr") {
-  paste(knitron.execute_code("0", profile), collapse="") == "0"
+  res <- paste(knitron.execute_code("0", profile), collapse="")
+  res == "0"
 }
 
 #' Execute a code chunk from a knitr option list

@@ -60,6 +60,11 @@ class Knitron(object):
         except (KeyError, TypeError):
             pyout = ""
 
+        try:
+            pyout += md["execute_result"]["data"]["text/plain"]
+        except (KeyError, TypeError):
+            pass
+
         return md["stdout"], md["stderr"], pyout
 
     @property
