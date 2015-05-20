@@ -26,19 +26,23 @@ x + 1
 
 ## Requirements
 
-- R and knitr
+- R with knitr and devtools
 - A recent version of IPython (knitron relies on the new `IPython.parallel` API)
 - pyzmq
 
-These can be installed by executing:
+These can be installed by executing (in a shell):
 
 ```bash
 Rscript -e "install.packages('knitr')"
+apt-get install python-dev libzmq3-dev libgit2-dev # on Debian and derivates
+Rscript -e "install.packages('devtools')"
 pip install IPython
 pip install pyzmq
 ```
 
 ## Installation
+
+In R:
 
 ```r
 library(devtools)
@@ -116,7 +120,7 @@ from time import sleep
 ```
 
 ```
-## CPU times: user 0 ns, sys: 1 ms, total: 1 ms
+## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
 ## Wall time: 501 ms
 ```
 
@@ -129,7 +133,7 @@ from time import sleep
 ## Variable     Type                          Data/Info
 ## ----------------------------------------------------
 ## matplotlib   module                        <module 'matplotlib' from<...>matplotlib/__init__.pyc'>
-## plt          module                        <module 'matplotlib.pyplo<...>7/matplotlib/pyplot.pyc'>
+## plt          module                        <module 'matplotlib.pyplo<...>s/matplotlib/pyplot.pyc'>
 ## sleep        builtin_function_or_method    <built-in function sleep>
 ## x            int                           5
 ```
