@@ -4,7 +4,7 @@ run_knit <- function(code, echo = FALSE, strip = TRUE, latex = FALSE, ft = FALSE
   opts_knit$set(base.dir = tmp)
   on.exit(unlink(tmp, recursive = TRUE))
 
-  options <- c(..., echo = echo, knitron.profile = profile)
+  options <- list(..., echo = echo, knitron.profile = profile)
   args <- if (length(options) == 0)
     ""
   else
