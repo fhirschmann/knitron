@@ -7,7 +7,7 @@ build-cran:
 	cd ..;\
 	R CMD build $(PKGSRC)
 
-install: build
+install: build-cran
 	cd ..;\
 	R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
 

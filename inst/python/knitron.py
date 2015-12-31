@@ -5,8 +5,12 @@ from json import dump, loads
 import os
 import sys
 
-from IPython.parallel import Client
-from IPython.parallel.client.remotefunction import RemoteFunction
+try:
+    from ipyparallel import Client
+    from ipyparallel.client.remotefunction import RemoteFunction
+except ImportError:
+    from IPython.parallel import Client
+    from IPython.parallel.client.remotefunction import RemoteFunction
 
 DEBUG = bool(os.environ.get("DEBUG", False))
 
