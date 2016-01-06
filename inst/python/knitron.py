@@ -40,6 +40,7 @@ class Knitron(object):
         :type kernel: integer
         """
         self.client = Client(profile=profile)
+        self.client[:].execute("%colors nocolor")
         self.view = self.client[:]
 
     def execute(self, *lines, **kwargs):
