@@ -34,6 +34,12 @@ pip install IPython
 pip install pyzmq
 ```
 
+In even newer version of IPython, the parallel API has been split in a
+separate package, usually called `ipyparallel`:
+```bash
+pip install ipyparallel
+```
+
 ## Installation
 
 In R:
@@ -63,6 +69,17 @@ By default, the `knitr` IPython profile will be used. You can change this using 
     ipcluster start --profile=knitr --n=1
 
 If the cluster has been spawned by knitron, it will be terminated on exit.
+
+### RStudio Usage
+
+To use knitron in RStudio, the knitron library needs to be loaded in an R chunk. This can
+usually be done in the preamble, i.e. for LaTeX before executing any IPython chunk, define:
+
+```
+<<setup, echo = F>>=
+library(knitron)
+@
+```
 
 ### Matplotlib
 
@@ -134,15 +151,3 @@ shift = np.linspace(0, L, ncolors, endpoint=False)
 for s in shift:
     plt.plot(x, np.sin(x + s), 'o-')
 ```
-
-### Sympy
-
-```{r, engine = 'ipython'}
-import sympy as sm
-
-x, y, z = sm.symbols("x y z")
-sm.solve([x * y - 7, x + y - 6], [x, y])
-```
-
-Of course, you could also use `sm.latex` and `results = 'asis'` in
-TeX documents.

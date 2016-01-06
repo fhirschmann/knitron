@@ -40,6 +40,12 @@ pip install IPython
 pip install pyzmq
 ```
 
+In even newer version of IPython, the parallel API has been split in a
+separate package, usually called `ipyparallel`:
+```bash
+pip install ipyparallel
+```
+
 ## Installation
 
 In R:
@@ -69,6 +75,17 @@ By default, the `knitr` IPython profile will be used. You can change this using 
     ipcluster start --profile=knitr --n=1
 
 If the cluster has been spawned by knitron, it will be terminated on exit.
+
+### RStudio Usage
+
+To use knitron in RStudio, the knitron library needs to be loaded in an R chunk. This can
+usually be done in the preamble, i.e. for LaTeX before executing any IPython chunk, define:
+
+```
+<<setup, echo = F>>=
+library(knitron)
+@
+```
 
 ### Matplotlib
 
@@ -121,7 +138,7 @@ from time import sleep
 
 ```
 ## CPU times: user 0 ns, sys: 0 ns, total: 0 ns
-## Wall time: 501 ms
+## Wall time: 500 ms
 ```
 
 
@@ -132,10 +149,17 @@ from time import sleep
 ```
 ## Variable     Type                          Data/Info
 ## ----------------------------------------------------
-## matplotlib   module                        <module 'matplotlib' from<...>matplotlib/__init__.pyc'>
-## plt          module                        <module 'matplotlib.pyplo<...>s/matplotlib/pyplot.pyc'>
+## L            int                           6
+## matplotlib   module                        <module 'matplotlib' from<...>/matplotlib/__init__.py'>
+## ncolors      int                           7
+## np           module                        <module 'numpy' from '/us<...>kages/numpy/__init__.py'>
+## plt          module                        <module 'matplotlib.pyplo<...>es/matplotlib/pyplot.py'>
+## s            float64                       5.14285714286
+## shift        ndarray                       7: 7 elems, type `float64`, 56 bytes
 ## sleep        builtin_function_or_method    <built-in function sleep>
 ## x            int                           5
+## y1           ndarray                       100: 100 elems, type `float64`, 800 bytes
+## y2           ndarray                       100: 100 elems, type `float64`, 800 bytes
 ```
 
 ### Matplotlib
@@ -162,22 +186,10 @@ for s in shift:
     plt.plot(x, np.sin(x + s), 'o-')
 ```
 
+```
+## /usr/lib/python3.5/site-packages/matplotlib/__init__.py:892: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
+##   warnings.warn(self.msg_depr % (key, alt_key))
+```
+
 
 ![plot of chunk example2](figure/example2-1.png) 
-
-### Sympy
-
-
-```python
-import sympy as sm
-
-x, y, z = sm.symbols("x y z")
-sm.solve([x * y - 7, x + y - 6], [x, y])
-```
-
-```
-## [(-sqrt(2) + 3, sqrt(2) + 3), (sqrt(2) + 3, -sqrt(2) + 3)]
-```
-
-Of course, you could also use `sm.latex` and `results = 'asis'` in
-TeX documents.
