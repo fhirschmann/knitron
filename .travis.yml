@@ -7,6 +7,7 @@ before_install:
   - sudo apt-get install -qq python python-pip texlive-latex-extra python-matplotlib
   - sudo pip install pyzmq
   - sudo pip install ipython
+  - sudo pip install ipyparallel
 install:
   - ./travis-tool.sh install_deps
 script: ./travis-tool.sh run_tests
