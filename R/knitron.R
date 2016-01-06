@@ -4,7 +4,7 @@
 #' @param wait wait for the engine to start up
 #' @param quiet be quiet about IPython's startup messages
 #' @export
-knitron.start <- function(profile = "knitr", wait = TRUE, quiet = TRUE) {
+knitron.start <- function(profile = "knitr", wait = TRUE, quiet = FALSE) {
   message(paste("Starting cluster for profile", profile))
 
   system2("ipcluster", c("start", paste("--profile", profile, sep="="), "--n=1"),
@@ -57,7 +57,7 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "chunk", json_file)
   out <- system2("ipython", args, input = jsonlite::toJSON(options, auto_unbox = TRUE),
                  wait = TRUE, stdout = TRUE, stderr = TRUE)
-  cat(paste(out, collapse = "\n"))
+  cat(paste(out, collapse=""))
   jsonlite::fromJSON(readLines(json_file))
 }
 
