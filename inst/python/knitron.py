@@ -189,7 +189,7 @@ if __name__ == "__main__":
         if curdir:
             kw.chdir(curdir)
     else:
-        code = sys.argv[3]
+        code = " ".join(sys.argv[3:])
         if type(code) in [str, unicode]:
             code = [code]
         output = kw.execute(*code)
