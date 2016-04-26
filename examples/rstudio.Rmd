@@ -1,0 +1,7 @@
+```{r, echo = F}
+suppressPackageStartupMessages(library(knitron))
+```
+
+```{r, engine = "ipython"}
+4 + 3
+```
