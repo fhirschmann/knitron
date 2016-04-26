@@ -14,6 +14,7 @@ knitron.start <- function(profile = "knitr", wait = TRUE, quiet = FALSE) {
   .knitron_env$profiles <- append(.knitron_env$profiles, profile)
 
   if (wait) {
+    Sys.sleep(15)
     # We wait until we can reach the cluster.
     count <- 0
     while (!knitron.is_running(profile)) {
