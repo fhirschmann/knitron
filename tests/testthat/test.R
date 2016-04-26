@@ -69,7 +69,7 @@ test_that("[markdown] Empty input outputs empty output", {
 
 test_that("[markdown] Plot is created", {
   res <- run_knit("plt.plot([1, 2, 3])")
-  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png) ")
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)")
   expect_equal(res$files, "figure/unnamed-chunk-1-1.png")
 })
 
@@ -83,7 +83,7 @@ test_that("[markdown] Two plots are created", {
   res <- run_knit(paste("x = plt.figure(); x1 = x.add_subplot(111); x1.plot([1, 2, 3])",
                     "y = plt.figure(); y1 = y.add_subplot(111); y1.plot([5, 6])", sep="\n"))
   expect_equal(res$out, paste("![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)",
-                              "\n![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-2.png) "))
+                              "\n![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-2.png)"))
   expect_equal(res$files, c("figure/unnamed-chunk-1-1.png", "figure/unnamed-chunk-1-2.png"))
 })
 
@@ -104,7 +104,7 @@ test_that("profiles are distinct", {
 
 test_that("[cairo png] image is created", {
   res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE)
-  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png) ")
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)")
   expect_equal(res$files, "figure/unnamed-chunk-1-1.png")
   expect_match(res$file_types, ".*PNG image.*")
 })
@@ -112,14 +112,14 @@ test_that("[cairo png] image is created", {
 test_that("[cairo jpeg] image is created", {
   skip("Not available on travis")
   res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE, dev = "CairoJPEG")
-  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.jpeg) ")
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.jpeg)")
   expect_equal(res$files, "figure/unnamed-chunk-1-1.jpeg")
   expect_match(res$file_types, ".*JPEG image.*")
 })
 
 test_that("[svg] image is created", {
   res <- run_knit("plt.plot([1, 2, 3])", ft = TRUE, dev = "svg")
-  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.svg) ")
+  expect_equal(res$out, "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.svg)")
   expect_equal(res$files, "figure/unnamed-chunk-1-1.svg")
   expect_match(res$file_types, ".*SVG Scalable Vector.*")
 })
