@@ -1,0 +1,8 @@
+```{r, echo = F}
+suppressPackageStartupMessages(library(knitron))
+```
+
+```{r, engine = "ipython", cache = TRUE}
+from time import time
+time()
+```
