@@ -8,8 +8,10 @@ before_install:
   - sudo pip install pyzmq
   - sudo pip install ipython
   - sudo pip install ipyparallel
+
 install:
   - ./travis-tool.sh install_deps
+
 script: ./travis-tool.sh run_tests
 
 after_failure:
