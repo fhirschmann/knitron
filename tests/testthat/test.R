@@ -83,7 +83,7 @@ test_that("[markdown] Two plots are created", {
   res <- run_knit(paste("x = plt.figure(); x1 = x.add_subplot(111); x1.plot([1, 2, 3])",
                     "y = plt.figure(); y1 = y.add_subplot(111); y1.plot([5, 6])", sep="\n"))
   expect_equal(res$out, paste("![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)",
-                              "\n![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-2.png)"))
+                              "![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-2.png)", sep = "\n"))
   expect_equal(res$files, c("figure/unnamed-chunk-1-1.png", "figure/unnamed-chunk-1-2.png"))
 })
 
