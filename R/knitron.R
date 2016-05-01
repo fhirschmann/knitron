@@ -43,6 +43,27 @@ knitron.start <- function(profile = "knitr", wait = TRUE) {
   close(stderr)
 }
 
+#' Check for invalid Python 2/3 combinations
+#' 
+#' @param profile the name of the profile
+#' @export
+knitron.checkversion <- function(profile) {
+  python <- getOption("ipython", "ipython")
+  ipcluster <- getOption("ipcluster", "ipcluster")
+  ipcluster_version <- knitron.execute_code("'import sys;print(sys.version_info.major)'",
+                                            profile)
+  ipython_version <- system2(python,
+                             "-c 'import sys;print(sys.version_info.major)'",
+                             stdout = TRUE)
+  
+  if (ipcluster_version != ipython_version) {
+    flog.warn(paste("Version mismatch: ", python, " has version ", ipython_version,
+                    ", but ", ipcluster, " is of version ", ipcluster_version, ". ",
+                    "This will likely result in unicode errors. ", 
+                    "Please set options(ipython = IPYTHON_PATH, ipcluster = IPCLUSTER_PATH).", sep = ""))
+  }
+}
+
 #' Stops an IPython cluster
 #' 
 #' @param profile the name of the profile
@@ -154,6 +175,8 @@ eng_ipython = function(options) {
 
   if (paste(options$code, sep = "", collapse = "") == "")
     return(knitr::engine_output(options, options$code, NULL, NULL))
+  
+  knitron.checkversion()
   
   result <- knitron.execute_chunk(koptions, profile)
 
