@@ -36,8 +36,8 @@ class Knitron(object):
     """
     def __init__(self, profile):
         """
-        :param kernel: the kernel id (process id)
-        :type kernel: integer
+        :param profile: the profile name
+        :type profile: string
         """
         self.client = Client(profile=profile)
         self.client[:].execute("%colors nocolor")
@@ -150,9 +150,16 @@ if __name__ == "__main__":
     # Usage:
     #   knitron.py PROFILE chunk JSON_OUTPUT << JSON_INPUT
     #   knitron.py PROFILE code COMMAND
-    kw = Knitron(sys.argv[1])
 
-    if sys.argv[2] == "chunk":
+    if sys.argv[2] == "isrunning":
+        try:
+            kw = Knitron(sys.argv[1])
+            print(kw.execute("True")[2])
+        except:
+            print("False")
+
+    elif sys.argv[2] == "chunk":
+        kw = Knitron(sys.argv[1])
         options = loads(sys.stdin.read())
 
         if options.get("knitron.base.dir", None):
@@ -189,6 +196,7 @@ if __name__ == "__main__":
         if curdir:
             kw.chdir(curdir)
     else:
+        kw = Knitron(sys.argv[1])
         code = " ".join(sys.argv[3:])
         if type(code) in [str, unicode]:
             code = [code]
