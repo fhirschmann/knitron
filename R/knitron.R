@@ -176,7 +176,7 @@ eng_ipython = function(options) {
   if (paste(options$code, sep = "", collapse = "") == "")
     return(knitr::engine_output(options, options$code, NULL, NULL))
   
-  knitron.checkversion()
+  knitron.checkversion(profile)
   
   result <- knitron.execute_chunk(koptions, profile)
 
