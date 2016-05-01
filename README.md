@@ -87,6 +87,8 @@ library(knitron)
 @
 ```
 
+An exemplary document showing the use of knitron inside RStudio [is available](https://raw.githubusercontent.com/fhirschmann/knitron/master/examples/rstudio.Rmd).
+
 ### Matplotlib
 
 Knitron imports matplotlib and pyplot (as `plt`) unless `knitron.matplotlib` is set
@@ -149,17 +151,14 @@ from time import sleep
 ```
 ## Variable     Type                          Data/Info
 ## ----------------------------------------------------
-## L            int                           6
-## matplotlib   module                        <module 'matplotlib' from<...>/matplotlib/__init__.py'>
-## ncolors      int                           7
-## np           module                        <module 'numpy' from '/us<...>kages/numpy/__init__.py'>
-## plt          module                        <module 'matplotlib.pyplo<...>es/matplotlib/pyplot.py'>
-## s            float64                       5.14285714286
-## shift        ndarray                       7: 7 elems, type `float64`, 56 bytes
+## f            function                      <function f at 0x7f504addf140>
+## matplotlib   module                        <module 'matplotlib' from<...>matplotlib/__init__.pyc'>
+## np           module                        <module 'numpy' from '/us<...>ages/numpy/__init__.pyc'>
+## plt          module                        <module 'matplotlib.pyplo<...>s/matplotlib/pyplot.pyc'>
 ## sleep        builtin_function_or_method    <built-in function sleep>
+## t1           ndarray                       50: 50 elems, type `float64`, 400 bytes
+## t2           ndarray                       250: 250 elems, type `float64`, 2000 bytes
 ## x            int                           5
-## y1           ndarray                       100: 100 elems, type `float64`, 800 bytes
-## y2           ndarray                       100: 100 elems, type `float64`, 800 bytes
 ```
 
 ### Matplotlib
@@ -174,7 +173,7 @@ plt.fill(x, y1, 'b', x, y2, 'r', alpha=0.3)
 ```
 
 
-![plot of chunk example1](figure/example1-1.png) 
+![plot of chunk example1](figure/example1-1.png)
 
 
 ```python
@@ -187,9 +186,9 @@ for s in shift:
 ```
 
 ```
-## /usr/lib/python3.5/site-packages/matplotlib/__init__.py:892: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
+## /usr/lib/python2.7/dist-packages/matplotlib/__init__.py:894: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
 ##   warnings.warn(self.msg_depr % (key, alt_key))
 ```
 
 
-![plot of chunk example2](figure/example2-1.png) 
+![plot of chunk example2](figure/example2-1.png)

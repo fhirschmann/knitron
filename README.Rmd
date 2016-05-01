@@ -81,6 +81,8 @@ library(knitron)
 @
 ```
 
+An exemplary document showing the use of knitron inside RStudio [is available](https://raw.githubusercontent.com/fhirschmann/knitron/master/examples/rstudio.Rmd).
+
 ### Matplotlib
 
 Knitron imports matplotlib and pyplot (as `plt`) unless `knitron.matplotlib` is set
