@@ -34,9 +34,10 @@ knitron.start <- function(profile = "knitr", wait = TRUE) {
     flog.info("Engine started up successfully")
     
     if (knitron.is_running()) {
-      flog.info("Communication with engine for profile", profile, "succeeded")
+      flog.info(paste("Communication with engine for profile", profile, "succeeded"))
     } else {
-      flog.error("Communication with engine for profile", profile, "failed")
+      flog.error(paste("Communication with engine for profile", profile, "failed"))
+      stop()
     }
   }
   close(stderr)
