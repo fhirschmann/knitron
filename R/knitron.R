@@ -36,9 +36,10 @@ knitron.start <- function(profile = "knitr", wait = TRUE) {
     if (knitron.is_running()) {
       flog.info("Communication with engine for profile", profile, "succeeded")
     } else {
-      flog.err("Communication with engine for profile", profile, "failed")
+      flog.error("Communication with engine for profile", profile, "failed")
     }
   }
+  close(stderr)
 }
 
 #' Stops an IPython cluster
@@ -47,7 +48,7 @@ knitron.start <- function(profile = "knitr", wait = TRUE) {
 #' @param quiet be quiet about IPython's shutdown messages
 #' @export
 knitron.stop <- function(profile = "knitr", quiet = TRUE) {
-  flog.info(paste("Stopping IPython engine for profile ", profile), name = "knitron")
+  flog.info(paste("Stopping IPython engine for profile", profile), name = "knitron")
   ipcluster <- getOption("ipcluster", "ipcluster")
   system2(ipcluster, c("stop", paste("--profile", profile, sep="=")),
           stderr = if(quiet) FALSE else "")
@@ -60,8 +61,21 @@ knitron.stop <- function(profile = "knitr", quiet = TRUE) {
 #' @return \code{TRUE} if cluster is running
 #' @export
 knitron.is_running <- function(profile = "knitr") {
-  res <- paste(knitron.execute_code("0", profile), collapse="")
-  res == "0"
+  python <- getOption("ipython", "ipython")
+  
+  profiles <- gsub("^\\s+|\\s+$", "", system2(python, c("profile",  "list"), stdout = TRUE))
+  if (profile %in% profiles) {
+    profile_dir <- system2(python, c("profile", "locate", profile), stdout = TRUE)
+    pidfile <- file.path(profile_dir, "pid", "ipcluster.pid")
+    if (!file.exists(pidfile)) return(FALSE)
+  } else {
+    return(FALSE)
+  }
+  
+  args <- paste(.knitron_env$knitron_wrapper, profile, "isrunning")
+  flog.debug(paste("Executing", python, args), name = "knitron")
+  res <- system2(python, args, wait = TRUE, stdout = TRUE, stderr = TRUE)
+  tail(res, 1) == "True"
 }
 
 #' Execute a code chunk from a knitr option list
