@@ -7,23 +7,33 @@
 knitron.start <- function(profile = "knitr", wait = TRUE, quiet = FALSE) {
   message(paste("Starting cluster for profile", profile))
 
-  system2("ipcluster", c("start", paste("--profile", profile, sep="="), "--n=1"),
-          wait = FALSE, stderr = if(quiet) FALSE else "")
+  ipcluster <- getOption("ipcluster", "ipcluster")
+  tmp <- tempfile("ipcluster_")
+  system2(ipcluster, c("start", paste("--profile", profile, sep="="), "--n=1"),
+          wait = FALSE, stderr = tmp)
   
   # Keep a list so that we can kill the clusters later
   .knitron_env$profiles <- append(.knitron_env$profiles, profile)
 
   if (wait) {
-    Sys.sleep(15)
-    # We wait until we can reach the cluster.
-    count <- 0
-    while (!knitron.is_running(profile)) {
-      Sys.sleep(0.5)
-      count <- count + 1
-      if (count > 40)
-        stop("IPython cluster could not be started. Giving up.")
+    Sys.sleep(1)
+    stderr <- file(tmp, "r")
+    running <- FALSE
+
+    while (!running) {
+      Sys.sleep(4)
+      lines <- readLines(tmp)
+      running <- any(grepl("Engines appear to have started successfully", lines))
+      if (!quiet) cat(paste("Waiting for IPython engine to start up (see ", tmp, ")\n", sep=""))
+      if (any(grepl("Cluster is already running", lines))) {
+        warning("Cluster is already running - reusing")
+        running <- TRUE
+      }
     }
+    cat("Engine started up successfully\n")
   }
+  close(stderr)
+  unlink(stderr)
 }
 
 #' Stops an IPython cluster
@@ -32,7 +42,8 @@ knitron.start <- function(profile = "knitr", wait = TRUE, quiet = FALSE) {
 #' @param quiet be quiet about IPython's shutdown messages
 #' @export
 knitron.stop <- function(profile = "knitr", quiet = TRUE) {
-  system2("ipcluster", c("stop", paste("--profile", profile, sep="=")),
+  ipcluster <- getOption("ipcluster", "ipcluster")
+  system2(ipcluster, c("stop", paste("--profile", profile, sep="=")),
           stderr = if(quiet) FALSE else "")
   .knitron_env$profiles <- setdiff(.knitron_env$profiles, profile)
 }
@@ -56,7 +67,8 @@ knitron.is_running <- function(profile = "knitr") {
 knitron.execute_chunk <- function(options, profile = "knitr") {
   json_file <- tempfile()
   args <- paste(.knitron_env$knitron_wrapper, profile, "chunk", json_file)
-  out <- system2("ipython", args, input = jsonlite::toJSON(options, auto_unbox = TRUE),
+  python <- getOption("python", "ipython")
+  out <- system2(python, args, input = jsonlite::toJSON(options, auto_unbox = TRUE),
                  wait = TRUE, stdout = TRUE, stderr = TRUE)
   cat(paste(out, collapse=""))
   jsonlite::fromJSON(readLines(json_file))
@@ -70,7 +82,8 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
 #' @export
 knitron.execute_code <- function(code, profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "code", code)
-  system2("ipython", args, wait = TRUE, stdout = TRUE, stderr = TRUE)
+  python <- getOption("python", "ipython")
+  system2(python, args, wait = TRUE, stdout = TRUE, stderr = TRUE)
 }
 
 .knitron_defaults <- function(options) {
