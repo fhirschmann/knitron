@@ -4,36 +4,49 @@
 #' @param wait wait for the engine to start up
 #' @param quiet be quiet about IPython's startup messages
 #' @export
-knitron.start <- function(profile = "knitr", wait = TRUE, quiet = FALSE) {
-  message(paste("Starting cluster for profile", profile))
-
+knitron.start <- function(profile = "knitr", wait = TRUE) {
   ipcluster <- getOption("ipcluster", "ipcluster")
   tmp <- tempfile("ipcluster_")
-  system2(ipcluster, c("start", paste("--profile", profile, sep="="), "--n=1"),
-          wait = FALSE, stderr = tmp)
+  args <- c("start", paste("--profile", profile, sep="="), "--n=1")
+  flog.info(paste("Starting cluster for profile", profile, "via",
+                  ipcluster, paste(args, collapse = " ")), name = "knitron")
+  system2(ipcluster, args, wait = FALSE, stderr = tmp)
   
-  # Keep a list so that we can kill the clusters later
-  .knitron_env$profiles <- append(.knitron_env$profiles, profile)
+  reuse <- knitron.is_running(profile)
+  if (reuse) flog.info("Reusing existing ipcluster", name = "knitron")
+    # Keep a list so that we can kill the clusters later
+  else .knitron_env$profiles <- append(.knitron_env$profiles, profile)
+  
 
-  if (wait) {
+  if (wait & !reuse) {
     Sys.sleep(1)
     stderr <- file(tmp, "r")
     running <- FALSE
 
+    count <- 0
     while (!running) {
+      if (count > 30) {
+        flog.error("The ipcluster startup log looks as follows:", name = "knitron")
+        sapply(readLines(tmp), function(...) flog.error(..., name = "knitron"))
+        stop("The IPython cluster failed to start up")
+      }
       Sys.sleep(4)
+      count <- count + 1
       lines <- readLines(tmp)
       running <- any(grepl("Engines appear to have started successfully", lines))
-      if (!quiet) cat(paste("Waiting for IPython engine to start up (see ", tmp, ")\n", sep=""))
+      flog.debug("Waiting for IPython engine to start up", name = "knitron")
       if (any(grepl("Cluster is already running", lines))) {
-        warning("Cluster is already running - reusing")
+        flog.warn("Cluster is already running - reusing", name = "knitron")
         running <- TRUE
       }
     }
-    cat("Engine started up successfully\n")
+    flog.info("Engine started up successfully", name = "knitron")
+
+    if (!knitron.is_running(profile)) {
+      flog.error("Communication with IPython failed.", name = "knitron")
+      stop("Communication with IPython failed")
+    }
   }
-  close(stderr)
-  unlink(stderr)
 }
 
 #' Stops an IPython cluster
@@ -42,6 +55,7 @@ knitron.start <- function(profile = "knitr", wait = TRUE, quiet = FALSE) {
 #' @param quiet be quiet about IPython's shutdown messages
 #' @export
 knitron.stop <- function(profile = "knitr", quiet = TRUE) {
+  flog.info(paste("Stopping cluster", profile), name = "knitron")
   ipcluster <- getOption("ipcluster", "ipcluster")
   system2(ipcluster, c("stop", paste("--profile", profile, sep="=")),
           stderr = if(quiet) FALSE else "")
@@ -54,8 +68,12 @@ knitron.stop <- function(profile = "knitr", quiet = TRUE) {
 #' @return \code{TRUE} if cluster is running
 #' @export
 knitron.is_running <- function(profile = "knitr") {
-  res <- paste(knitron.execute_code("0", profile), collapse="")
-  res == "0"
+  args <- paste(.knitron_env$knitron_wrapper, profile, "isrunning")
+  python <- getOption("python", "ipython")
+  flog.debug(paste("Executing", python, args), name = "knitron")
+
+  res <- system2(python, args, wait = TRUE, stdout = TRUE)
+  res == "True"
 }
 
 #' Execute a code chunk from a knitr option list
@@ -83,6 +101,7 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
 knitron.execute_code <- function(code, profile = "knitr") {
   args <- paste(.knitron_env$knitron_wrapper, profile, "code", code)
   python <- getOption("python", "ipython")
+  flog.debug(paste("Executing", python, args), name = "knitron")
   system2(python, args, wait = TRUE, stdout = TRUE, stderr = TRUE)
 }
 
