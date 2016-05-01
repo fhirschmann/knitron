@@ -1,0 +1,4 @@
+Name: Insert Knitron Preamble
+Description: Inserts the knitron preamble at the cursor position.
+Binding: knitrPreambleAddin
+Interactive: false

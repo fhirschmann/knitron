@@ -16,6 +16,7 @@ Depends:
     knitr (>= 1.8)
 Imports: 
     jsonlite(>= 0.9.13),
-    futile.logger
+    futile.logger,
+    rstudioapi (>= 0.4),
 Suggests: 
     testthat(>= 0.9),
