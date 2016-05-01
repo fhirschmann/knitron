@@ -91,15 +91,8 @@ knitron.execute_chunk <- function(options, profile = "knitr") {
   flog.debug(paste("Executing code chunk via", python, args), name = "knitron")
   out <- system2(python, args, input = jsonlite::toJSON(options, auto_unbox = TRUE),
                  wait = TRUE, stdout = TRUE, stderr = TRUE)
-  if (attr(out, "status") > 0) {
-    flog.error("The following chunk failed to execute:", name = "knitron")
-    flog.error(options$code, name = "knitron")
-    flog.error("The error was:", name = "knitron")
-    sapply(out, function(...) flog.error(..., name = "knitron"))
-    list(stderr=out)
-  } else {
-    jsonlite::fromJSON(readLines(json_file))
-  }
+  cat(paste(out, collapse=""))
+  jsonlite::fromJSON(readLines(json_file))
 }
 
 #' Execute a single Python command
