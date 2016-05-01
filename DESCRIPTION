@@ -16,6 +16,5 @@ Depends:
     knitr (>= 1.8)
 Imports: 
     jsonlite(>= 0.9.13),
-    futile.logger
 Suggests: 
     testthat(>= 0.9),
