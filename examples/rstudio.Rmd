@@ -5,3 +5,7 @@ suppressPackageStartupMessages(library(knitron))
 ```{r, engine = "ipython"}
 4 + 3
 ```
+
+```{r, engine = "ipython"}
+plt.plot([1, 2, 3])
+```
