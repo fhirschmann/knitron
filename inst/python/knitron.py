@@ -4,6 +4,7 @@ from functools import partial
 from json import dump, loads
 import os
 import sys
+import traceback
 
 try:
     from ipyparallel import Client
@@ -156,6 +157,7 @@ if __name__ == "__main__":
             kw = Knitron(sys.argv[1])
             print(kw.execute("True")[2])
         except:
+            traceback.print_exc(file=sys.stderr)
             print("False")
 
     elif sys.argv[2] == "chunk":
@@ -173,7 +175,11 @@ if __name__ == "__main__":
         if type(options["code"]) in [str, unicode]:
             options["code"] = [options["code"]]
 
-        stdout, stderr, text = kw.execute(*options["code"])
+        try:
+            stdout, stderr, text = kw.execute(*options["code"])
+        except:
+            # ipyparallel 3 handles this differently than 2
+            stdout, stderr, text = [], traceback.format_exc().split("\n"), []
 
         # Save all figures in the current chunk to files
         figures = []
