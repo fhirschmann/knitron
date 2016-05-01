@@ -1,0 +1,9 @@
+```{r, echo = F}
+suppressPackageStartupMessages(library(knitron))
+options(ipython = "ipython3", ipcluster = "ipcluster3")
+```
+
+```{r, engine = "ipython"}
+import sys
+sys.version
+```
