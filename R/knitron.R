@@ -134,7 +134,9 @@ eng_ipython = function(options) {
   koptions <- .knitron_defaults(options)
   koptions$knitron.fig.path <- fig_path("", options, NULL)
   koptions$knitron.base.dir <- knitr::opts_knit$get("base.dir")
-  
+  if (is.null(koptions$knitron.base.dir))
+    koptions$knitron.base.dir = getwd()
+
   if (is.null(koptions$fig.ext))
     koptions$fig.ext <- dev2ext(koptions$dev)
   koptions$knitron.backend <- dev2backend(koptions$dev)
